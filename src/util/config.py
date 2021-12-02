@@ -10,6 +10,7 @@ import curses
 class System:
     PATH_SPLITTER: str = "\\" if sys.platform == "win32" else "/"
 
+
 # Constant name for conductor message
 @dataclass
 class MsgSection:
@@ -20,10 +21,11 @@ class MsgSection:
     END_NEGATIVE_ROUND: str = "END NEGATIVE ROUND"
     END_GAME          : str = "END GAME"
 
+
 # Constant for ascii art of the game
 @dataclass
 class AsciiArt:
-    TITLE            : str = text2art("CMD-Line HANGMAN")
+    TITLE            : str = "\n".join([" " * 10 + x for x in text2art("CMD-Line HANGMAN", font="contrast").split("\n")])
     HANGMAN          : str = "  -------\n" + \
                              "  |     |\n" + \
                              "  |     {head}\n" + \
@@ -38,6 +40,12 @@ class AsciiArt:
     HANGMAN_RIGHT_ARM: str = "\\"
     HANGMAN_RIGHT_LEG: str = "\\"
     HANGMAN_FOOT     : str = "_"
+    CONDUCTOR        : str = "───────▄██████▄───────\n" + \
+                             "──────▐▀▀▀▀▀▀▀▀▌──────\n" + \
+                             "──────▌▌▀▀▌▐▀▀▐▐──────\n" + \
+                             "──────▐──▄▄▄▄──▌──────\n" + \
+                             "───────▌▐▌──▐▌▐───────\n"
+
 
 # Constant for specified colors
 @dataclass
@@ -47,13 +55,13 @@ class Colors:
 
     TITLE             : Tuple[int, int, Optional[int]] = (curses.COLOR_YELLOW, 1)
     START_GAME        : Tuple[int, int, Optional[int]] = (curses.COLOR_GREEN,  2)
-    START_ROUND       : Tuple[int, int, Optional[int]] = (curses.COLOR_YELLOW, 3)
-    ON_ERROR          : Tuple[int, int, Optional[int]] = (curses.COLOR_RED,    4)
-    END_POSITIVE_ROUND: Tuple[int, int, Optional[int]] = (curses.COLOR_BLUE,   5)
-    END_NEGATIVE_ROUND: Tuple[int, int, Optional[int]] = (curses.COLOR_RED,    6)
-    END_GAME          : Tuple[int, int, Optional[int]] = (curses.COLOR_GREEN,  7)
-    HANGMAN_CORRECT   : Tuple[int, int, Optional[int]] = (curses.COLOR_GREEN,  8)
-    # HANGMAN_ERROR     : Tuple[int, int, Optional[int]] = (curses.COLOR_RED,    9)
+    START_ROUND       : Tuple[int, int, Optional[int]] = (curses.COLOR_YELLOW, 1)
+    ON_ERROR          : Tuple[int, int, Optional[int]] = (curses.COLOR_RED,    3)
+    END_POSITIVE_ROUND: Tuple[int, int, Optional[int]] = (curses.COLOR_BLUE,   4)
+    END_NEGATIVE_ROUND: Tuple[int, int, Optional[int]] = (curses.COLOR_RED,    3)
+    END_GAME          : Tuple[int, int, Optional[int]] = (curses.COLOR_GREEN,  2)
+    HANGMAN_CORRECT   : Tuple[int, int, Optional[int]] = (curses.COLOR_GREEN,  2)
+    HANGMAN_ERROR     : Tuple[int, int, Optional[int]] = (curses.COLOR_RED,    3)
 
     @classmethod
     def black(cls) -> int:
@@ -68,18 +76,13 @@ class Colors:
         cls.__setup = new_value
 
     @classmethod
-    def setup_colors(cls) -> List[int]:
+    def setup_colors(cls) -> None:
         """ Setup the colors generating the pairs """
         if not cls.setup():
-            curses.init_pair(cls.TITLE[1], cls.TITLE[0], cls.black())  # For the title
-            curses.init_pair(cls.START_GAME[1], cls.START_GAME[0], cls.black())  # For start_game
-            curses.init_pair(cls.START_ROUND[1], cls.START_ROUND[0], cls.black())  # For START_round
-            curses.init_pair(cls.ON_ERROR[1], cls.ON_ERROR[0], cls.black())  # For ON_ERROR
-            curses.init_pair(cls.END_POSITIVE_ROUND[1], cls.END_POSITIVE_ROUND[0], cls.black())  # For END_POSITIVE_ROUND
-            curses.init_pair(cls.END_NEGATIVE_ROUND[1], cls.END_NEGATIVE_ROUND[0], cls.black())  # For END_NEGATIVE_ROUND
-            curses.init_pair(cls.END_GAME[1], cls.END_GAME[0], cls.black())  # For END_GAME
-            curses.init_pair(cls.HANGMAN_CORRECT[0], cls.HANGMAN_CORRECT[1], cls.black())  # For correct guess
-            # curses.init_pair(cls.HANGMAN_ERROR[0], cls.HANGMAN_ERROR[1], cls.black())  # For wrong guess
+            curses.init_pair(1, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+            curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
+            curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK)
+            curses.init_pair(4, curses.COLOR_BLUE, curses.COLOR_BLACK)
 
             cls.set_setup(True)
 

@@ -6,54 +6,75 @@ import curses
 
 
 class TerminalHangman:
-    def __init__(self, stdscr: curses.window) -> None:
-        """ The init method """
-        self.__stdscr = stdscr  # The standard screen for curses
+	def __init__(self, stdscr: curses.window) -> None:
+		""" The init method """
+		self.__stdscr = stdscr  # The standard screen for curses
+		self.__stdscr.nodelay(True)
 
-        # Setupping colors
-        Colors.setup_colors()
+		# Setupping colors
+		Colors.setup_colors()
 
-        self.__word_generator = WordOracle()                    # The word generator oracle
-        self.__conductor      = Conductor()                     # The conductor of the game
-        self.__game_status    = GameStatus(round=0, word="")    # The status of the game
+		self.__word_generator = WordOracle()                    # The word generator oracle
+		self.__conductor      = Conductor()                     # The conductor of the game
+		self.__game_status    = GameStatus(round=0, word="")    # The status of the game
 
-    def __show_title(self) -> None:
-        """ Show the title of the game """
-        # curses.init_pair(1, Colors.TITLE[0], curses.COLOR_BLACK)
-        self.__stdscr.addstr(0, 0, AsciiArt.TITLE, Colors.return_pair_for_index(1))
+	def __show_title(self) -> None:
+		""" Show the title of the game """
+		self.__stdscr.addstr(1, 0, AsciiArt.TITLE, Colors.return_pair_for_index(Colors.TITLE[1]) | curses.A_BOLD)
+		self.__stdscr.refresh()
 
-    def _start_game(self) -> None:
-        """ Start the game """
-        self.__stdscr.clear()
+	def __show_conductor(self) -> None:
+		""" Show the conductor """
+		conductor_window = Conductor.initialize_container(self.__stdscr)
 
-        # Let's show the game's title
-        self.__show_title()
+		# Show conductor
+		self.__conductor.print(conductor_window, section="START GAME")
+		conductor_window.refresh()
 
-        # Show conductor
-        self.__conductor.print(self.__stdscr, section="START GAME")
+		conductor_pad = self.__conductor.add_condactor_art()
+		conductor_pad.refresh(0, 0, 12, curses.COLS - 30, 17, curses.COLS - 9)
 
-        # show hangman
-        self.__stdscr.addstr(19, 0, AsciiArt.HANGMAN.format(
-            head=AsciiArt.HANGMAN_HEAD, larm=AsciiArt.HANGMAN_LEFT_ARM, body=AsciiArt.HANGMAN_BODY,
-            rarm=AsciiArt.HANGMAN_RIGHT_ARM, lleg=AsciiArt.HANGMAN_LEFT_LEG, rleg=AsciiArt.HANGMAN_RIGHT_LEG,
-            lfoot=AsciiArt.HANGMAN_FOOT, rfoot=AsciiArt.HANGMAN_FOOT
-        ))
+	def _start_game(self) -> None:
+		""" Start the game """
+		self.__stdscr.clear()
 
-        self.__stdscr.getch()
+		# Let's show the game's title
+		self.__show_title()
 
-        # Refresh the screen
-        self.__stdscr.refresh()
+		# Let's show the conductor
+		self.__show_conductor()
 
-    def run(self) -> None:
-        """ Run the game """
-        # Start the game
-        self._start_game()
+		# show hangman
+		self.__stdscr.addstr(21, 0, AsciiArt.HANGMAN.format(
+			head=AsciiArt.HANGMAN_HEAD, larm=AsciiArt.HANGMAN_LEFT_ARM, body=AsciiArt.HANGMAN_BODY,
+			rarm=AsciiArt.HANGMAN_RIGHT_ARM, lleg=AsciiArt.HANGMAN_LEFT_LEG, rleg=AsciiArt.HANGMAN_RIGHT_LEG,
+			lfoot=AsciiArt.HANGMAN_FOOT, rfoot=AsciiArt.HANGMAN_FOOT
+		))
+
+		while True:
+			try:
+				key = self.__stdscr.getkey()
+				self.__stdscr.addstr(30, 30, key)
+
+				# If the user press ESC then quit
+				if key == '\x1b':
+					break
+
+			except (KeyboardInterrupt, EOFError):
+				sys.exit(0)
+			except curses.error:
+				...
+
+	def run(self) -> None:
+		""" Run the game """
+		# Start the game
+		self._start_game()
 
 
-def hangman(stdscr) -> None:
-    t = TerminalHangman(stdscr)
-    t.run()
+def main(stdscr) -> None:
+	t = TerminalHangman(stdscr)
+	t.run()
 
 
 if __name__ == "__main__":
-    curses.wrapper(hangman)
+	curses.wrapper(main)

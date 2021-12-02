@@ -1,8 +1,8 @@
-from typing import List, Dict
+from typing import Dict
 from src.util.config import *
-from time import sleep
 import os.path as osp
 import curses
+from curses.textpad import rectangle
 
 
 class Conductor:
@@ -10,32 +10,16 @@ class Conductor:
         """ The init method """
         self.__msgs_file = open(osp.join(System.PATH_SPLITTER.join(__file__.split(System.PATH_SPLITTER)[:-1]), "messages.txt"))
 
-        # Define color pair and get the respective number
-        stg_pair, str_pair, oner_pair, endposrnd_pair, endnegrnd_pair, endgame_pair = [Colors.return_pair_for_index(i) for i in range(2, 8)]
-
         self.__msg_dict: Dict[str, Tuple[List[str], str]] = {  # Messages for each section of the conductor
-            MsgSection.START_GAME         : ([], stg_pair),
-            MsgSection.START_ROUND        : ([], str_pair),
-            MsgSection.ON_ERROR           : ([], oner_pair),
-            MsgSection.END_POSITIVE_ROUND : ([], endposrnd_pair),
-            MsgSection.END_NEGATIVE_ROUND : ([], endnegrnd_pair),
-            MsgSection.END_GAME           : ([], endgame_pair)
+            MsgSection.START_GAME         : ([], Colors.return_pair_for_index(Colors.START_GAME[1])),
+            MsgSection.START_ROUND        : ([], Colors.return_pair_for_index(Colors.START_ROUND[1])),
+            MsgSection.ON_ERROR           : ([], Colors.return_pair_for_index(Colors.ON_ERROR[1])),
+            MsgSection.END_POSITIVE_ROUND : ([], Colors.return_pair_for_index(Colors.END_POSITIVE_ROUND[1])),
+            MsgSection.END_NEGATIVE_ROUND : ([], Colors.return_pair_for_index(Colors.END_NEGATIVE_ROUND[1])),
+            MsgSection.END_GAME           : ([], Colors.return_pair_for_index(Colors.END_GAME[1]))
         }
 
         self._fulfill()  # Fill the message dict
-
-    @staticmethod
-    def _setup_colors() -> List[int]:
-        """ Setup the colors for each sections and retursn  """
-        # curses.init_pair(Colors.START_GAME[1], Colors.START_GAME[0], Colors.black)  # For start_game
-        # curses.init_pair(Colors.START_ROUND[1], Colors.START_ROUND[0], Colors.black)  # For START_round
-        # curses.init_pair(Colors.ON_ERROR[1], Colors.ON_ERROR[0], Colors.black)  # For ON_ERROR
-        # curses.init_pair(Colors.END_POSITIVE_ROUND[1], Colors.END_POSITIVE_ROUND[0], Colors.black)  # For END_POSITIVE_ROUND
-        # curses.init_pair(Colors.END_NEGATIVE_ROUND[1], Colors.END_NEGATIVE_ROUND[0], Colors.black)  # For END_NEGATIVE_ROUND
-        # curses.init_pair(Colors.END_GAME[1], Colors.END_GAME[0], Colors.black)  # For END_GAME
-
-        # return [curses.color_pair(i) for i in range(2, 8)]
-        ...
 
     def _fulfill(self) -> None:
         """ Fill the list for each section of the message file """
@@ -57,13 +41,32 @@ class Conductor:
             if end_negative_round and line != "\n": self.__msg_dict[MsgSection.END_NEGATIVE_ROUND][0].append(line[2:-1])
             if end_game and line != "\n": self.__msg_dict[MsgSection.END_GAME][0].append(line[2:-1])
 
-    def print(self, stdscr: curses.window, section: str) -> None:
+    @staticmethod
+    def initialize_container(stdscr: curses.window) -> curses.window:
+        """ Initialize the new container for the conductor messages """
+        conductor_window = curses.newwin(11, curses.COLS - 2, 9, 1)
+        stdscr.addstr(9, 3, "Conductor", Colors.return_pair_for_index(Colors.TITLE[1]) | curses.A_UNDERLINE)
+        conductor_window.clear()
+        conductor_window.box()
+
+        return conductor_window
+
+    @staticmethod
+    def add_condactor_art() -> curses.window:
+        """ Add the Ascii Art of the conductor """
+        conductor_pad = curses.newpad(100, 100)
+        conductor_pad.clear()
+        conductor_pad.addstr(AsciiArt.CONDUCTOR, curses.A_BOLD)
+
+        return conductor_pad
+
+    def print(self, cond_window: curses.window, section: str) -> None:
         """ Print the messages of the corresponding section """
         try:
 
             lines, color = self.__msg_dict[section]
             for i, line in enumerate(lines):
-                stdscr.addstr(10 + i,10, line, color | curses.A_BOLD)
+                cond_window.addstr(2 + i, 3, line, color | curses.A_BOLD)
 
         except (KeyboardInterrupt, EOFError):
             sys.exit(0)
