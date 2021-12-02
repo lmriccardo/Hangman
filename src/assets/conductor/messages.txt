@@ -1,0 +1,26 @@
+START GAME:
+> Ciao, benvenuto nel gioco dell'impiccato
+> In ogni round, una parola sarà selezionata
+> Alcune delle sue lettere sono già mostrate
+> Il tuo obiettivo è di indovinare tante parole
+> Fai attenzione! Hai un tempo limite
+> Seleziona le celle da scrivere con le frecce
+> Scrivi una lettera con la tastiera
+
+START ROUND:
+> Il gioco è iniziato
+> Muoviti! Ricoardati, hai tempo limitato
+
+ON ERROR:
+> Oh No! L'hai mancata
+
+END POSITIVE ROUND:
+> Ben fatto! Inizia un altro round
+
+END WRONG ROUND:
+> Non ti arrendere!
+> Farai meglio nel prossimo round
+
+END GAME:
+> Il gioco è terminato.
+> Punteggio:

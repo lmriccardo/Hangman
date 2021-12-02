@@ -1,0 +1,5 @@
+hangman_venv/*
+hangman_venv/Scripts/*
+hangman_venv/Lib/*
+hangman_venv/Include/*
+.idea/*
