@@ -19,8 +19,8 @@ class TerminalHangman:
 
     def __show_title(self) -> None:
         """ Show the title of the game """
-        curses.init_pair(1, Colors.TITLE[0], curses.COLOR_BLACK)
-        self.__stdscr.addstr(0, 0, AsciiArt.TITLE, curses.color_pair(1))
+        # curses.init_pair(1, Colors.TITLE[0], curses.COLOR_BLACK)
+        self.__stdscr.addstr(0, 0, AsciiArt.TITLE, Colors.return_pair_for_index(1))
 
     def _start_game(self) -> None:
         """ Start the game """

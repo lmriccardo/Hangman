@@ -2,4 +2,7 @@ cmdline_hangman_venv/*
 cmdline_hangman_venv/Scripts/*
 cmdline_hangman_venv/Lib/*
 cmdline_hangman_venv/Include/*
+cmdline_hangman_venv/bin/*
+cmdline_hangman_venv/include/*
+cmdline_hangman_venv/lib/*
 .idea/*

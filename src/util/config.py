@@ -53,7 +53,7 @@ class Colors:
     END_NEGATIVE_ROUND: Tuple[int, int, Optional[int]] = (curses.COLOR_RED,    6)
     END_GAME          : Tuple[int, int, Optional[int]] = (curses.COLOR_GREEN,  7)
     HANGMAN_CORRECT   : Tuple[int, int, Optional[int]] = (curses.COLOR_GREEN,  8)
-    HANGMAN_ERROR     : Tuple[int, int, Optional[int]] = (curses.COLOR_RED,    9)
+    # HANGMAN_ERROR     : Tuple[int, int, Optional[int]] = (curses.COLOR_RED,    9)
 
     @classmethod
     def black(cls) -> int:
@@ -79,7 +79,7 @@ class Colors:
             curses.init_pair(cls.END_NEGATIVE_ROUND[1], cls.END_NEGATIVE_ROUND[0], cls.black())  # For END_NEGATIVE_ROUND
             curses.init_pair(cls.END_GAME[1], cls.END_GAME[0], cls.black())  # For END_GAME
             curses.init_pair(cls.HANGMAN_CORRECT[0], cls.HANGMAN_CORRECT[1], cls.black())  # For correct guess
-            curses.init_pair(cls.HANGMAN_ERROR[0], cls.HANGMAN_ERROR[1], cls.black())  # For wrong guess
+            # curses.init_pair(cls.HANGMAN_ERROR[0], cls.HANGMAN_ERROR[1], cls.black())  # For wrong guess
 
             cls.set_setup(True)
 

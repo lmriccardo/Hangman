@@ -1,5 +1,4 @@
 from typing import List, Dict
-from rich.console import Console
 from src.util.config import *
 from time import sleep
 import os.path as osp
