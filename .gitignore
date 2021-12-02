@@ -1,5 +1,5 @@
-hangman_venv/*
-hangman_venv/Scripts/*
-hangman_venv/Lib/*
-hangman_venv/Include/*
+cmdline_hangman_venv/*
+cmdline_hangman_venv/Scripts/*
+cmdline_hangman_venv/Lib/*
+cmdline_hangman_venv/Include/*
 .idea/*
