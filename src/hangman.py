@@ -3,7 +3,7 @@ import time
 from typing import List
 from src.conductor.conductor import Conductor
 from src.word.oracle import WordOracle
-from src.game_state import GameStatus
+from src.game.game import Game
 from src.util.config import *
 import curses
 import pydub
@@ -21,7 +21,7 @@ class TerminalHangman:
 
 		self.__word_generator = WordOracle()                    # The word generator oracle
 		self.__conductor      = Conductor()                     # The conductor of the game
-		self.__game_status    = GameStatus(round=0, word="")    # The status of the game
+		self.__game 		  = Game(self.__conductor)			# The game object
 
 		# Get the background music
 		self.__background_music = pydub.AudioSegment.from_mp3(System.SCIFI_MUSIC)
@@ -52,6 +52,7 @@ class TerminalHangman:
 		""" Show the conductor """
 		# Initialize the conductor window
 		conductor_window = Conductor.initialize_container()
+		self.__conductor.window = conductor_window
 
 		# Create the pad in which insert the ASCII Art of the conductor
 		self.__conductor.add_condactor_art()
@@ -62,7 +63,16 @@ class TerminalHangman:
 		time.sleep(0.5)
 
 		# Print the introduction from the Conductor
-		self.__conductor.print(conductor_window, section="START GAME")
+		self.__conductor.print(section="START GAME")
+
+	def __show_game(self) -> None:
+		""" Show the game window """
+		# Initialize the game window
+		game_window = self.__game.initialize_window()
+		self.__game.window = game_window
+
+		self.__game.add_hangman()
+		curses.doupdate()
 
 	def _start_game(self) -> None:
 		""" Start the game """
@@ -78,12 +88,15 @@ class TerminalHangman:
 			# Let's show the conductor
 			self.__show_conductor()
 
+			# Let's introduce the game
+			self.__show_game()
+
 			# show hangman
-			self.__stdscr.addstr(21, 0, AsciiArt.HANGMAN.format(
-				head=AsciiArt.HANGMAN_HEAD, larm=AsciiArt.HANGMAN_LEFT_ARM, body=AsciiArt.HANGMAN_BODY,
-				rarm=AsciiArt.HANGMAN_RIGHT_ARM, lleg=AsciiArt.HANGMAN_LEFT_LEG, rleg=AsciiArt.HANGMAN_RIGHT_LEG,
-				lfoot=AsciiArt.HANGMAN_FOOT, rfoot=AsciiArt.HANGMAN_FOOT
-			), curses.A_BOLD)
+			# self.__stdscr.addstr(21, 0, AsciiArt.HANGMAN.format(
+			# 	head=AsciiArt.HANGMAN_HEAD, larm=AsciiArt.HANGMAN_LEFT_ARM, body=AsciiArt.HANGMAN_BODY,
+			# 	rarm=AsciiArt.HANGMAN_RIGHT_ARM, lleg=AsciiArt.HANGMAN_LEFT_LEG, rleg=AsciiArt.HANGMAN_RIGHT_LEG,
+			# 	lfoot=AsciiArt.HANGMAN_FOOT, rfoot=AsciiArt.HANGMAN_FOOT
+			# ), curses.A_BOLD)
 
 			while True:
 				try:

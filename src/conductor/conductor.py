@@ -21,6 +21,8 @@ class Conductor:
             MsgSection.END_GAME           : ([], Colors.return_pair_for_index(Colors.END_GAME[1]))
         }
 
+        self.__window = None
+
         self._fulfill()  # Fill the message dict
 
         # Get the sound of the typewriter
@@ -33,6 +35,16 @@ class Conductor:
     def music_thread(self) -> multiprocessing.Process:
         """ Return the Process object for the music player """
         return self.__music_thread
+
+    @property
+    def window(self):
+        """ Return the window of the conductor """
+        return self.__window
+
+    @window.setter
+    def window(self, new_value) -> None:
+        """ Set the new value for the attribute window """
+        self.__window = new_value
 
     def _fulfill(self) -> None:
         """ Fill the list for each section of the message file """
@@ -74,7 +86,7 @@ class Conductor:
         conductor_pad.addstr(AsciiArt.CONDUCTOR, curses.A_BOLD)
         conductor_pad.noutrefresh(0, 0, 13, curses.COLS - 30, 18, curses.COLS - 9)
 
-    def print(self, cond_window: curses.window, section: str) -> None:
+    def print(self, section: str) -> None:
         """ Print the messages of the corresponding section """
         self.__music_thread.start()
         lines, color = self.__msg_dict[section]
@@ -82,9 +94,10 @@ class Conductor:
         for i, line in enumerate(lines):
             j = 3
             for char in line:
-                cond_window.addstr(2 + i, j, char, color | curses.A_BOLD)
+                self.__window.addstr(2 + i, j, char, color | curses.A_BOLD)
                 j += 1
                 time.sleep(0.05)
-                cond_window.refresh()
+                self.__window.refresh()
 
+        self.__window.refresh()
         self.__music_thread.terminate()
