@@ -13,7 +13,7 @@ class System:
     SCIFI_MUSIC     : str = osp.join(PATH_SPLITTER.join(__file__.split(PATH_SPLITTER)[:-2]), "music/scifi.mp3")
     TYPEWRITER_MUSIC: str = osp.join(PATH_SPLITTER.join(__file__.split(PATH_SPLITTER)[:-2]), "music/writer.mp3")
     MESSAGES_FILE   : str = osp.join(PATH_SPLITTER.join(__file__.split(PATH_SPLITTER)[:-2]), "conductor/messages.txt")
-    WORDS_FILE      : str = osp.join(PATH_SPLITTER.join(__file__.split(PATH_SPLITTER)[:-2]), "word/660000_parole_italiane.txt")
+    WORDS_FILE      : str = osp.join(PATH_SPLITTER.join(__file__.split(PATH_SPLITTER)[:-2]), "word/words_ita.txt")
 
 
 # Constant name for conductor message
@@ -31,13 +31,19 @@ class MsgSection:
 @dataclass
 class AsciiArt:
     TITLE            : str = text2art("CMD-Line HANGMAN", font="contrast")
-    HANGMAN          : str = "  -------\n" + \
-                             "  |     |\n" + \
-                             "  |     {head}\n" + \
-                             "  |    {larm}{body}{rarm}\n" + \
-                             "  |   {lfoot}{lleg} {rleg}{rfoot}\n" + \
-                             "  |      \n" + \
-                             "############\n"
+    HANGMAN          : str = "  -------------\n"\
+                             "  =============\n" + \
+                             "  |||         |\n" + \
+                             "  |||         {head}\n" + \
+                             "  |||        {larm}{body}{rarm}\n" + \
+                             "  |||       {lfoot}{lleg} {rleg}{rfoot}\n" + \
+                             "  |||          \n" + \
+                             "  |||          \n" + \
+                             "  |||          \n" + \
+                             "  |||          \n" + \
+                             "  |||          \n" + \
+                             "  |||          \n" + \
+                             "##################\n"
     HANGMAN_HEAD     : str = "O"
     HANGMAN_BODY     : str = "|"
     HANGMAN_LEFT_ARM : str = "/"

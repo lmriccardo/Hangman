@@ -1,6 +1,6 @@
-import threading
+import multiprocessing
 import time
-
+from typing import List
 from src.conductor.conductor import Conductor
 from src.word.oracle import WordOracle
 from src.game_state import GameStatus
@@ -26,7 +26,9 @@ class TerminalHangman:
 		# Get the background music
 		self.__background_music = pydub.AudioSegment.from_mp3(System.SCIFI_MUSIC)
 		self.__background_music -= 20
-		self.__bckgrd_music_thread = threading.Thread(target=playbck.play, args=(self.__background_music,))
+		self.__bckgrd_music_thread = multiprocessing.Process(target=playbck.play, args=(self.__background_music,))
+
+		self.__processes: List[multiprocessing.Process] = [self.__bckgrd_music_thread, self.__conductor.music_thread]
 
 	def __show_title(self) -> None:
 		""" Show the title of the game """
@@ -49,7 +51,7 @@ class TerminalHangman:
 	def __show_conductor(self) -> None:
 		""" Show the conductor """
 		# Initialize the conductor window
-		conductor_window = Conductor.initialize_container(self.__stdscr)
+		conductor_window = Conductor.initialize_container()
 
 		# Create the pad in which insert the ASCII Art of the conductor
 		self.__conductor.add_condactor_art()
@@ -81,7 +83,7 @@ class TerminalHangman:
 				head=AsciiArt.HANGMAN_HEAD, larm=AsciiArt.HANGMAN_LEFT_ARM, body=AsciiArt.HANGMAN_BODY,
 				rarm=AsciiArt.HANGMAN_RIGHT_ARM, lleg=AsciiArt.HANGMAN_LEFT_LEG, rleg=AsciiArt.HANGMAN_RIGHT_LEG,
 				lfoot=AsciiArt.HANGMAN_FOOT, rfoot=AsciiArt.HANGMAN_FOOT
-			))
+			), curses.A_BOLD)
 
 			while True:
 				try:
@@ -97,12 +99,21 @@ class TerminalHangman:
 				except curses.error:
 					...
 		except (KeyboardInterrupt, EOFError):
-			sys.exit(0)
+			self.terminate()
 
 	def run(self) -> None:
 		""" Run the game """
 		# Start the game
 		self._start_game()
+
+	def terminate(self) -> None:
+		""" Terminate all the secondary processes and return to the main window """
+		# Kill processes
+		for process in self.__processes:
+			process.terminate()
+
+		# Return to the main screen settings
+		curses.endwin()
 
 
 def main(stdscr) -> None:

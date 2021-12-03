@@ -4,7 +4,7 @@ from src.util.config import *
 import curses
 import pydub
 import pydub.playback as playbck
-import threading
+import multiprocessing
 
 
 class Conductor:
@@ -27,7 +27,12 @@ class Conductor:
         self.__type_writer_sound = pydub.AudioSegment.from_mp3(System.TYPEWRITER_MUSIC)[:-100]
         self.__type_writer_sound += self.__type_writer_sound * 6 + self.__type_writer_sound[:-1000]
         self.__type_writer_sound -= 30
-        self.__music_thread = threading.Thread(target=playbck.play, args=(self.__type_writer_sound,))
+        self.__music_thread = multiprocessing.Process(target=playbck.play, args=(self.__type_writer_sound,))
+
+    @property
+    def music_thread(self) -> multiprocessing.Process:
+        """ Return the Process object for the music player """
+        return self.__music_thread
 
     def _fulfill(self) -> None:
         """ Fill the list for each section of the message file """
@@ -50,10 +55,11 @@ class Conductor:
             if end_game and line != "\n": self.__msg_dict[MsgSection.END_GAME][0].append(line[2:-1])
 
     @staticmethod
-    def initialize_container(stdscr: curses.window) -> curses.window:
+    def initialize_container() -> curses.window:
         """ Initialize the new container for the conductor messages """
         y_postion = 2 + len(AsciiArt.TITLE.split("\n")) + 1 # The +2s are the padding
         conductor_window = curses.newwin(11, curses.COLS - 2, y_postion, 1)
+        conductor_window.nodelay(True)
         conductor_window.box()
         conductor_window.addstr(0, 3, "Conductor", Colors.return_pair_for_index(Colors.TITLE[1]) | curses.A_UNDERLINE)
         conductor_window.noutrefresh()
@@ -70,17 +76,15 @@ class Conductor:
 
     def print(self, cond_window: curses.window, section: str) -> None:
         """ Print the messages of the corresponding section """
-        try:
+        self.__music_thread.start()
+        lines, color = self.__msg_dict[section]
 
-            self.__music_thread.start()
-            lines, color = self.__msg_dict[section]
-            for i, line in enumerate(lines):
-                j = 3
-                for char in line:
-                    cond_window.addstr(2 + i, j, char, color | curses.A_BOLD)
-                    j += 1
-                    time.sleep(0.07)
-                    cond_window.refresh()
+        for i, line in enumerate(lines):
+            j = 3
+            for char in line:
+                cond_window.addstr(2 + i, j, char, color | curses.A_BOLD)
+                j += 1
+                time.sleep(0.05)
+                cond_window.refresh()
 
-        except (KeyboardInterrupt, EOFError):
-            sys.exit(0)
+        self.__music_thread.terminate()
