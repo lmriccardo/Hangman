@@ -1,6 +1,6 @@
-from typing import Tuple, Optional
+from typing import Tuple, Dict, Union
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from art import *
 import curses
 import os.path as osp
@@ -31,19 +31,20 @@ class MsgSection:
 @dataclass
 class AsciiArt:
     TITLE            : str = text2art("CMD-Line HANGMAN", font="contrast")
-    HANGMAN          : str = "  -------------\n"\
-                             "  =============\n" + \
-                             "  |||         |\n" + \
-                             "  |||         {head}\n" + \
-                             "  |||        {larm}{body}{rarm}\n" + \
-                             "  |||       {lfoot}{lleg} {rleg}{rfoot}\n" + \
-                             "  |||          \n" + \
-                             "  |||          \n" + \
-                             "  |||          \n" + \
-                             "  |||          \n" + \
-                             "  |||          \n" + \
-                             "  |||          \n" + \
-                             "##################\n"
+    HANGMAN          : str = "-------------\n"\
+                             "=============\n" + \
+                             "|█         |\n" + \
+                             "|█         {head}\n" + \
+                             "|█        {larm}{body}{rarm}\n" + \
+                             "|█       {lfoot}{lleg} {rleg}{rfoot}\n" + \
+                             "|█          \n" + \
+                             "|█          \n" + \
+                             "|█          \n" + \
+                             "|█          \n" + \
+                             "|█          \n" + \
+                             "|█          \n" + \
+                             "▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀\n" + \
+                             "###################\n"
     HANGMAN_HEAD     : str = "O"
     HANGMAN_BODY     : str = "|"
     HANGMAN_LEFT_ARM : str = "/"
@@ -64,15 +65,16 @@ class Colors:
     __black: int  = curses.COLOR_BLACK
     __setup: bool = False
 
-    TITLE             : Tuple[int, int, Optional[int]] = (curses.COLOR_YELLOW, 1)
-    START_GAME        : Tuple[int, int, Optional[int]] = (curses.COLOR_GREEN,  2)
-    START_ROUND       : Tuple[int, int, Optional[int]] = (curses.COLOR_YELLOW, 1)
-    ON_ERROR          : Tuple[int, int, Optional[int]] = (curses.COLOR_RED,    3)
-    END_POSITIVE_ROUND: Tuple[int, int, Optional[int]] = (curses.COLOR_BLUE,   4)
-    END_NEGATIVE_ROUND: Tuple[int, int, Optional[int]] = (curses.COLOR_RED,    3)
-    END_GAME          : Tuple[int, int, Optional[int]] = (curses.COLOR_GREEN,  2)
-    HANGMAN_CORRECT   : Tuple[int, int, Optional[int]] = (curses.COLOR_GREEN,  2)
-    HANGMAN_ERROR     : Tuple[int, int, Optional[int]] = (curses.COLOR_RED,    3)
+    TITLE             : Tuple[int, int] = (curses.COLOR_YELLOW, 1)
+    START_GAME        : Tuple[int, int] = (curses.COLOR_GREEN,  2)
+    START_ROUND       : Tuple[int, int] = (curses.COLOR_YELLOW, 1)
+    ON_ERROR          : Tuple[int, int] = (curses.COLOR_RED,    3)
+    END_POSITIVE_ROUND: Tuple[int, int] = (curses.COLOR_BLUE,   4)
+    END_NEGATIVE_ROUND: Tuple[int, int] = (curses.COLOR_RED,    3)
+    END_GAME          : Tuple[int, int] = (curses.COLOR_GREEN,  2)
+    HANGMAN_CORRECT   : Tuple[int, int] = (curses.COLOR_GREEN,  2)
+    HANGMAN_ERROR     : Tuple[int, int] = (curses.COLOR_RED,    3)
+    GAME_BORDER_WIN   : Tuple[int, int] = (curses.COLOR_RED,    3)
 
     @classmethod
     def black(cls) -> int:
@@ -101,3 +103,72 @@ class Colors:
     def return_pair_for_index(cls, color_index: int) -> int:
         """ Return the corresponding pair identifier """
         return curses.color_pair(color_index)
+
+@dataclass
+class GameSettings:
+    __SettingDictType = Tuple[Tuple[str, Union[str, int, Tuple[int, int]]]]
+
+    MAX_ROUND_TIME:   str = "MAX ROUND TIME"
+    TOT_ROUND_NUMBER: str = "TOT ROUND NUMBER"
+    GAME_DIFFICULTY:  str = "GAME DIFFICULTY"
+    MAX_ROUND_SCORE:  str = "MAX ROUND SCORE"
+    WORD_LENGTH:      str = "WORD LENGH"
+    PENALTY:          str = "PENALTY"
+    HINT_NUMBER:      str = "HINT NUMBER"
+    HINT_PENALTY:     str = "HINT PENALTY"
+
+    EASY_SETUP: __SettingDictType = (
+        ("MAX ROUND TIME",        60),
+        ("TOT ROUND NUMBER",      10),
+        ("GAME DIFFICULTY",   "Easy"),
+        ("MAX ROUND SCORE",      100),
+        ("WORD LENGHT",       (5, 7)),
+        ("PENALTY",                1),
+        ("HINT NUMBER",       (3, 5)),
+        ("HINT PENALTY",           0)
+    )
+
+    MEDIUM_SETUP: __SettingDictType = (
+        ("MAX ROUND TIME",       300),
+        ("TOT ROUND NUMBER",      10),
+        ("GAME DIFFICULTY", "Medium"),
+        ("MAX ROUND SCORE",      100),
+        ("WORD LENGHT",       (7, 9)),
+        ("PENALTY",                1),
+        ("HINT NUMBER",       (2, 4)),
+        ("HINT PENALTY",           0)
+    )
+
+    HARD_SETUP: __SettingDictType = (
+        ("MAX ROUND TIME",       600),
+        ("TOT ROUND NUMBER",      10),
+        ("GAME DIFFICULTY",   "Hard"),
+        ("MAX ROUND SCORE",      100),
+        ("WORD LENGHT",      (9, 11)),
+        ("PENALTY",                1),
+        ("HINT NUMBER",       (1, 3)),
+        ("HINT PENALTY",           0)
+    )
+
+    VERY_HARD_SETUP: __SettingDictType = (
+        ("MAX ROUND TIME",           1200),
+        ("TOT ROUND NUMBER",           10),
+        ("GAME DIFFICULTY",   "Very Hard"),
+        ("MAX ROUND SCORE",           100),
+        ("WORD LENGHT",          (11, -1)), # -1 means maximum
+        ("PENALTY",                     2),
+        ("HINT NUMBER",          (1,   3)),
+        ("HINT PENALTY",                1)  # Final score -= len(word) / (max_hint * 100)
+    )
+
+    @classmethod
+    def get_settings(cls, difficulty: str) -> Dict[str, Union[str, int, Tuple[int, int]]]:
+        """ Return the setting of the corresponding difficulty """
+        return dict(
+            {
+                "Easy": cls.EASY_SETUP,
+                "Medium": cls.MEDIUM_SETUP,
+                "Hard": cls.HARD_SETUP,
+                "Very Hard": cls.VERY_HARD_SETUP
+            }.get(difficulty)
+        )

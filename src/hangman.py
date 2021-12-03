@@ -71,7 +71,11 @@ class TerminalHangman:
 		game_window = self.__game.initialize_window()
 		self.__game.window = game_window
 
-		self.__game.add_hangman()
+		curses.doupdate()
+
+		game_hangman_pad = self.__game.add_hangman_pad()
+		self.__game.hangman_pad = game_hangman_pad
+
 		curses.doupdate()
 
 	def _start_game(self) -> None:
@@ -90,13 +94,6 @@ class TerminalHangman:
 
 			# Let's introduce the game
 			self.__show_game()
-
-			# show hangman
-			# self.__stdscr.addstr(21, 0, AsciiArt.HANGMAN.format(
-			# 	head=AsciiArt.HANGMAN_HEAD, larm=AsciiArt.HANGMAN_LEFT_ARM, body=AsciiArt.HANGMAN_BODY,
-			# 	rarm=AsciiArt.HANGMAN_RIGHT_ARM, lleg=AsciiArt.HANGMAN_LEFT_LEG, rleg=AsciiArt.HANGMAN_RIGHT_LEG,
-			# 	lfoot=AsciiArt.HANGMAN_FOOT, rfoot=AsciiArt.HANGMAN_FOOT
-			# ), curses.A_BOLD)
 
 			while True:
 				try:
