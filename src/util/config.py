@@ -33,10 +33,10 @@ class AsciiArt:
     TITLE            : str = text2art("CMD-Line HANGMAN", font="contrast")
     HANGMAN          : str = "-------------\n"\
                              "=============\n" + \
-                             "|█         |\n" + \
-                             "|█         {head}\n" + \
-                             "|█        {larm}{body}{rarm}\n" + \
-                             "|█       {lfoot}{lleg} {rleg}{rfoot}\n" + \
+                             "|█          |\n" + \
+                             "|█          {head}\n" + \
+                             "|█         {larm}{body}{rarm}\n" + \
+                             "|█        {lfoot}{lleg} {rleg}{rfoot}\n" + \
                              "|█          \n" + \
                              "|█          \n" + \
                              "|█          \n" + \
@@ -112,7 +112,7 @@ class GameSettings:
     TOT_ROUND_NUMBER: str = "TOT ROUND NUMBER"
     GAME_DIFFICULTY:  str = "GAME DIFFICULTY"
     MAX_ROUND_SCORE:  str = "MAX ROUND SCORE"
-    WORD_LENGTH:      str = "WORD LENGH"
+    WORD_LENGTH:      str = "WORD LENGHT"
     PENALTY:          str = "PENALTY"
     HINT_NUMBER:      str = "HINT NUMBER"
     HINT_PENALTY:     str = "HINT PENALTY"
@@ -155,7 +155,7 @@ class GameSettings:
         ("TOT ROUND NUMBER",           10),
         ("GAME DIFFICULTY",   "Very Hard"),
         ("MAX ROUND SCORE",           100),
-        ("WORD LENGHT",          (11, -1)), # -1 means maximum
+        ("WORD LENGHT",          (11, 20)), # -1 means maximum
         ("PENALTY",                     2),
         ("HINT NUMBER",          (1,   3)),
         ("HINT PENALTY",                1)  # Final score -= len(word) / (max_hint * 100)
