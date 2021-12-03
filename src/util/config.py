@@ -1,14 +1,19 @@
-from typing import Tuple, List, Optional
+from typing import Tuple, Optional
 import sys
 from dataclasses import dataclass
 from art import *
 import curses
+import os.path as osp
 
 
 # Splitter for path in python, wrt the operating system
 @dataclass
 class System:
-    PATH_SPLITTER: str = "\\" if sys.platform == "win32" else "/"
+    PATH_SPLITTER   : str = "\\" if sys.platform == "win32" else "/"
+    SCIFI_MUSIC     : str = osp.join(PATH_SPLITTER.join(__file__.split(PATH_SPLITTER)[:-2]), "music/scifi.mp3")
+    TYPEWRITER_MUSIC: str = osp.join(PATH_SPLITTER.join(__file__.split(PATH_SPLITTER)[:-2]), "music/writer.mp3")
+    MESSAGES_FILE   : str = osp.join(PATH_SPLITTER.join(__file__.split(PATH_SPLITTER)[:-2]), "conductor/messages.txt")
+    WORDS_FILE      : str = osp.join(PATH_SPLITTER.join(__file__.split(PATH_SPLITTER)[:-2]), "word/660000_parole_italiane.txt")
 
 
 # Constant name for conductor message
@@ -25,7 +30,7 @@ class MsgSection:
 # Constant for ascii art of the game
 @dataclass
 class AsciiArt:
-    TITLE            : str = "\n".join([" " * 10 + x for x in text2art("CMD-Line HANGMAN", font="contrast").split("\n")])
+    TITLE            : str = text2art("CMD-Line HANGMAN", font="contrast")
     HANGMAN          : str = "  -------\n" + \
                              "  |     |\n" + \
                              "  |     {head}\n" + \

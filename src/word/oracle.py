@@ -1,8 +1,6 @@
 from typing import List, Tuple, Union
 from src.util.config import System
-import os.path as osp
 import random
-import sys
 
 
 class WordOracle:
@@ -11,8 +9,7 @@ class WordOracle:
         """ The init method """
         self.__words: List[str] = []  # A list of italian words
 
-        path_words_prefix: str = System.PATH_SPLITTER.join(__file__.split(System.PATH_SPLITTER)[:-1])
-        with open(osp.join(path_words_prefix, "660000_parole_italiane.txt"), mode="r") as stream:
+        with open(System.WORDS_FILE, mode="r") as stream:
             while word := stream.readline():
                 self.__words.append(word)
 

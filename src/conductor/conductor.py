@@ -1,14 +1,16 @@
-from typing import Dict
+import time
+from typing import Dict, List
 from src.util.config import *
-import os.path as osp
 import curses
-from curses.textpad import rectangle
+import pydub
+import pydub.playback as playbck
+import threading
 
 
 class Conductor:
     def __init__(self) -> None:
         """ The init method """
-        self.__msgs_file = open(osp.join(System.PATH_SPLITTER.join(__file__.split(System.PATH_SPLITTER)[:-1]), "messages.txt"))
+        self.__msgs_file = open(System.MESSAGES_FILE)
 
         self.__msg_dict: Dict[str, Tuple[List[str], str]] = {  # Messages for each section of the conductor
             MsgSection.START_GAME         : ([], Colors.return_pair_for_index(Colors.START_GAME[1])),
@@ -20,6 +22,12 @@ class Conductor:
         }
 
         self._fulfill()  # Fill the message dict
+
+        # Get the sound of the typewriter
+        self.__type_writer_sound = pydub.AudioSegment.from_mp3(System.TYPEWRITER_MUSIC)[:-100]
+        self.__type_writer_sound += self.__type_writer_sound * 6 + self.__type_writer_sound[:-1000]
+        self.__type_writer_sound -= 30
+        self.__music_thread = threading.Thread(target=playbck.play, args=(self.__type_writer_sound,))
 
     def _fulfill(self) -> None:
         """ Fill the list for each section of the message file """
@@ -44,29 +52,35 @@ class Conductor:
     @staticmethod
     def initialize_container(stdscr: curses.window) -> curses.window:
         """ Initialize the new container for the conductor messages """
-        conductor_window = curses.newwin(11, curses.COLS - 2, 9, 1)
-        stdscr.addstr(9, 3, "Conductor", Colors.return_pair_for_index(Colors.TITLE[1]) | curses.A_UNDERLINE)
-        conductor_window.clear()
+        y_postion = 2 + len(AsciiArt.TITLE.split("\n")) + 1 # The +2s are the padding
+        conductor_window = curses.newwin(11, curses.COLS - 2, y_postion, 1)
         conductor_window.box()
+        conductor_window.addstr(0, 3, "Conductor", Colors.return_pair_for_index(Colors.TITLE[1]) | curses.A_UNDERLINE)
+        conductor_window.noutrefresh()
 
         return conductor_window
 
     @staticmethod
-    def add_condactor_art() -> curses.window:
+    def add_condactor_art() -> None:
         """ Add the Ascii Art of the conductor """
         conductor_pad = curses.newpad(100, 100)
         conductor_pad.clear()
         conductor_pad.addstr(AsciiArt.CONDUCTOR, curses.A_BOLD)
-
-        return conductor_pad
+        conductor_pad.noutrefresh(0, 0, 13, curses.COLS - 30, 18, curses.COLS - 9)
 
     def print(self, cond_window: curses.window, section: str) -> None:
         """ Print the messages of the corresponding section """
         try:
 
+            self.__music_thread.start()
             lines, color = self.__msg_dict[section]
             for i, line in enumerate(lines):
-                cond_window.addstr(2 + i, 3, line, color | curses.A_BOLD)
+                j = 3
+                for char in line:
+                    cond_window.addstr(2 + i, j, char, color | curses.A_BOLD)
+                    j += 1
+                    time.sleep(0.07)
+                    cond_window.refresh()
 
         except (KeyboardInterrupt, EOFError):
             sys.exit(0)
