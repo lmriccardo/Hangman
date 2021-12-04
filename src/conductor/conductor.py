@@ -12,18 +12,16 @@ class Conductor:
         """ The init method """
         self.__msgs_file = open(System.MESSAGES_FILE)
 
-        self.__msg_dict: Dict[str, Tuple[List[str], str]] = {  # Messages for each section of the conductor
-            MsgSection.START_GAME         : ([], Colors.return_pair_for_index(Colors.START_GAME[1])),
-            MsgSection.START_ROUND        : ([], Colors.return_pair_for_index(Colors.START_ROUND[1])),
-            MsgSection.ON_ERROR           : ([], Colors.return_pair_for_index(Colors.ON_ERROR[1])),
-            MsgSection.END_POSITIVE_ROUND : ([], Colors.return_pair_for_index(Colors.END_POSITIVE_ROUND[1])),
-            MsgSection.END_NEGATIVE_ROUND : ([], Colors.return_pair_for_index(Colors.END_NEGATIVE_ROUND[1])),
-            MsgSection.END_GAME           : ([], Colors.return_pair_for_index(Colors.END_GAME[1]))
+        self.__msg_dict: Dict[str, Tuple[List[str], int]] = {  # Messages for each section of the conductor
+            "START GAME"         : (list(Messages.START_GAME), Colors.return_pair_for_index(Colors.START_GAME[1])),
+            "START ROUND"        : (list(Messages.START_ROUND), Colors.return_pair_for_index(Colors.START_ROUND[1])),
+            "ON ERROR"           : (list(Messages.ON_ERROR), Colors.return_pair_for_index(Colors.ON_ERROR[1])),
+            "END POSITIVE ROUND" : (list(Messages.END_POSITIVE_ROUND), Colors.return_pair_for_index(Colors.END_POSITIVE_ROUND[1])),
+            "END NEGATIVE ROUND" : (list(Messages.END_NEGATIVE_ROUND), Colors.return_pair_for_index(Colors.END_NEGATIVE_ROUND[1])),
+            "END GAME"           : (list(Messages.END_GAME), Colors.return_pair_for_index(Colors.END_GAME[1]))
         }
 
         self.__window = None
-
-        self._fulfill()  # Fill the message dict
 
         # Get the sound of the typewriter
         self.__type_writer_sound = pydub.AudioSegment.from_mp3(System.TYPEWRITER_MUSIC)[:-100]
@@ -45,26 +43,6 @@ class Conductor:
     def window(self, new_value) -> None:
         """ Set the new value for the attribute window """
         self.__window = new_value
-
-    def _fulfill(self) -> None:
-        """ Fill the list for each section of the message file """
-        start_game = start_round = on_error = end_positive_round = end_negative_round = end_game = False
-        while line := self.__msgs_file.readline():
-            if line.isupper():
-                start_game = line == MsgSection.START_GAME + ":\n"
-                start_round = line == MsgSection.START_ROUND + ":\n"
-                on_error = line == MsgSection.ON_ERROR + ":\n"
-                end_positive_round = line == MsgSection.END_POSITIVE_ROUND + ":\n"
-                end_negative_round = line == MsgSection.END_NEGATIVE_ROUND + ":\n"
-                end_game = line == MsgSection.END_GAME + ":\n"
-                continue
-
-            if start_game and line != "\n": self.__msg_dict[MsgSection.START_GAME][0].append(line[2:-1])
-            if start_round and line != "\n": self.__msg_dict[MsgSection.START_ROUND][0].append(line[2:-1])
-            if on_error and line != "\n": self.__msg_dict[MsgSection.ON_ERROR][0].append(line[2:-1])
-            if end_positive_round and line != "\n": self.__msg_dict[MsgSection.END_POSITIVE_ROUND][0].append(line[2:-1])
-            if end_negative_round and line != "\n": self.__msg_dict[MsgSection.END_NEGATIVE_ROUND][0].append(line[2:-1])
-            if end_game and line != "\n": self.__msg_dict[MsgSection.END_GAME][0].append(line[2:-1])
 
     @staticmethod
     def initialize_container() -> curses.window:

@@ -72,6 +72,10 @@ class Game:
 
         return game_window
 
+    def add_query_game(self) -> None:
+        """ Ask the user if he is ready to start the game and ask also the difficulty """
+
+
     def add_hangman_pad(self) -> curses.window:
         """ Add the pad for the hangman """
         hangman_pad = curses.newpad(100, 100)

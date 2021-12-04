@@ -18,13 +18,52 @@ class System:
 
 # Constant name for conductor message
 @dataclass
-class MsgSection:
-    START_GAME        : str = "START GAME"
-    START_ROUND       : str = "START ROUND"
-    ON_ERROR          : str = "ON ERROR"
-    END_POSITIVE_ROUND: str = "END POSITIVE ROUND"
-    END_NEGATIVE_ROUND: str = "END NEGATIVE ROUND"
-    END_GAME          : str = "END GAME"
+class Messages:
+    START_GAME        : Tuple[str] = (
+        "Hi, Welcome in the Hangman game!",
+        "In each round a word will be selected",
+        "Some of its letters are yet shown",
+        "Your goal is to guess as many words as you can",
+        "Be careful! You have limited time",
+        "Select the char textbox using arrows",
+        "Write a letter using the corresponding key"
+    )
+
+    START_ROUND       : Tuple[str] = (
+        "The game has started",
+        "Go! Remember, you have limited time"
+    )
+
+    ON_ERROR          : Tuple[str] = (
+        "Oh No! You miss that"
+    )
+
+    END_POSITIVE_ROUND: Tuple[str] = (
+        "Well done! Let start another round"
+    )
+
+    END_NEGATIVE_ROUND: Tuple[str] = (
+        "Don't give up!",
+        "You will do better in the next round"
+    )
+
+    END_GAME          : Tuple[str] = (
+        "The game has ended.",
+        "Score: "
+    )
+
+    ASK_DIFFICULTY    : Tuple[str] = (
+        "Choose which difficulty you wanna play with"
+    )
+
+    INFO_DIFFICULTY   : Tuple[str] = (
+        "{intro} ... Do You wanna something {diff}?",
+        "Ok, Let's do it ... Remember you have {time_per_round} minute per round",
+        "Up to {nround} round, with max score each of {max_score} (in percentage)",
+        "The word queried can be {length} lenght, and for each wrong guess {penalty}",
+        "part of the body will be added to the hangman.",
+        "You can have {hints} hint, and for each used hint you will have {hint_penalty}"
+    )
 
 
 # Constant for ascii art of the game
@@ -104,6 +143,8 @@ class Colors:
         """ Return the corresponding pair identifier """
         return curses.color_pair(color_index)
 
+
+# Recall all the settings for each game's difficulty
 @dataclass
 class GameSettings:
     __SettingDictType = Tuple[Tuple[str, Union[str, int, Tuple[int, int]]]]
@@ -116,6 +157,7 @@ class GameSettings:
     PENALTY:          str = "PENALTY"
     HINT_NUMBER:      str = "HINT NUMBER"
     HINT_PENALTY:     str = "HINT PENALTY"
+    INTRO:            str = "INTRO"
 
     EASY_SETUP: __SettingDictType = (
         ("MAX ROUND TIME",        60),
@@ -125,7 +167,8 @@ class GameSettings:
         ("WORD LENGHT",       (5, 7)),
         ("PENALTY",                1),
         ("HINT NUMBER",       (3, 5)),
-        ("HINT PENALTY",           0)
+        ("HINT PENALTY",           0),
+        ("INTRO","You stupid newbie")
     )
 
     MEDIUM_SETUP: __SettingDictType = (
@@ -136,7 +179,8 @@ class GameSettings:
         ("WORD LENGHT",       (7, 9)),
         ("PENALTY",                1),
         ("HINT NUMBER",       (2, 4)),
-        ("HINT PENALTY",           0)
+        ("HINT PENALTY",           0),
+        ("INTRO","You that avoid difficulties")
     )
 
     HARD_SETUP: __SettingDictType = (
@@ -147,7 +191,8 @@ class GameSettings:
         ("WORD LENGHT",      (9, 11)),
         ("PENALTY",                1),
         ("HINT NUMBER",       (1, 3)),
-        ("HINT PENALTY",           0)
+        ("HINT PENALTY",           0),
+        ("INTRO",      "You foolish")
     )
 
     VERY_HARD_SETUP: __SettingDictType = (
@@ -158,7 +203,8 @@ class GameSettings:
         ("WORD LENGHT",          (11, 20)), # -1 means maximum
         ("PENALTY",                     2),
         ("HINT NUMBER",          (1,   3)),
-        ("HINT PENALTY",                1)  # Final score -= len(word) / (max_hint * 100)
+        ("HINT PENALTY",                1),  # Final score -= len(word) / (max_hint * 100)
+        ("INTRO",    "You stupid foolish")
     )
 
     @classmethod

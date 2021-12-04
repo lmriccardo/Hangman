@@ -35,6 +35,7 @@ class GameSetting:
         assert GameSettings.PENALTY in custom_settings.keys(), "Missing PENALTY"                    # Check for the PENALTY
         assert GameSettings.HINT_NUMBER in custom_settings.keys(), "Missing HINT NUMBER"            # Check for the HINT NUMBER
         assert GameSettings.HINT_PENALTY in custom_settings.keys(), "Missing HINT PENALTY"          # Check for the HINT PENALTY
+        assert GameSettings.INTRO in custom_settings.keys(), "Missing INTRO"                        # Check for intro message
 
     def get_max_time_per_round(self) -> int:
         """ Return the maximum time per round in seconds """
@@ -67,6 +68,14 @@ class GameSetting:
     def get_hint_penalty(self) -> int:
         """ Return a bit 0/1. If 0 no penalty, otherwise tot_score = tot_score - (word_len) / (max_hint * 100) """
         return self.__settings[GameSettings.HINT_PENALTY]
+
+    def get_intro(self)-> str:
+        """ Return the intro message """
+        return self.__settings[GameSettings.INTRO]
+
+    def change_game_difficulty(self, new_difficulty: str) -> None:
+        """ Change the game difficulty and set new settings """
+        self.__settings = GameSettings.get_settings(new_difficulty)
 
 
 class GameStatus:
