@@ -1,6 +1,6 @@
 from typing import Tuple, Dict, Union
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from art import *
 import curses
 import os.path as osp

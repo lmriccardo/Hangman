@@ -92,7 +92,7 @@ class Game:
         difficulties = ["Easy", "Medium", "Hard", "Very Hard"]
         ask_pad.addstr(0, 0, Messages.ASK_DIFFICULTY + ":", curses.A_BOLD)
 
-        initial_pos = pos_x = (len(Messages.ASK_DIFFICULTY) - len("    ".join(difficulties))) // 2
+        initial_pos = pos_x = (len(Messages.ASK_DIFFICULTY) - len("   ".join(difficulties))) // 2
         for i, diff in enumerate(difficulties):
             if i == 0:
                 ask_pad.attron(curses.A_BLINK | curses.A_REVERSE)
@@ -102,7 +102,7 @@ class Game:
             if i == 0:
                 ask_pad.attroff(curses.A_BLINK | curses.A_REVERSE)
 
-            pos_x += len(diff) + 4
+            pos_x += len(diff) + 3
 
         ask_pad.move(2, initial_pos - 1)
 
@@ -110,6 +110,45 @@ class Game:
         ask_pad.noutrefresh(0, 0, y, x, y + 2, x + len(Messages.ASK_DIFFICULTY))
 
         return ask_pad
+
+    def get_difficulty(self, stdscr: curses.window) -> str:
+        """ Get the user input to choose the difficulty """
+        difficulties = ["Easy", "Medium", "Hard", "Very Hard"]
+        current_diff_idx = previous_diff_idx = 0
+        current_position_x = previous_position_x = (len(Messages.ASK_DIFFICULTY) - len("   ".join(difficulties))) // 2
+        while True:
+            try:
+
+                key = stdscr.getkey()
+
+                # If the user has pressed ENTER, return the current difficulty
+                if key == "\n":
+                    return difficulties[current_diff_idx].upper()
+
+                previous_diff_idx = current_diff_idx
+                previous_position_x = current_position_x
+
+                if key == "KEY_LEFT" and current_diff_idx > 0:
+                    current_diff_idx -= 1
+                    current_position_x -= (3 + len(difficulties[current_diff_idx]))
+                elif key == "KEY_RIGHT" and current_diff_idx < len(difficulties) - 1:
+                    current_diff_idx += 1
+                    current_position_x += len(difficulties[previous_diff_idx]) + 3
+
+                # We have to reverse and blink the current diff, and unset the attr
+                # of the previous selected difficulty
+                if previous_diff_idx != current_diff_idx:
+                    # Set the attribute
+                    self.__query_game_pad.addstr(2, current_position_x, difficulties[current_diff_idx].upper(),
+                                                 curses.A_BLINK | curses.A_REVERSE)
+                    # Unset attribute
+                    self.__query_game_pad.addstr(2, previous_position_x, difficulties[previous_diff_idx].upper())
+
+                    y, x = self.__gwin_y + 2, (self.__gwin_w - len(Messages.ASK_DIFFICULTY)) // 2
+                    self.__query_game_pad.refresh(0, 0, y, x, y + 2, x + len(Messages.ASK_DIFFICULTY))
+
+            except curses.error:
+                ...
 
     def add_hangman_pad(self) -> curses.window:
         """ Add the pad for the hangman """
