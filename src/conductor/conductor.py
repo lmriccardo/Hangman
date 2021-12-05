@@ -10,8 +10,6 @@ import multiprocessing
 class Conductor:
     def __init__(self) -> None:
         """ The init method """
-        self.__msgs_file = open(System.MESSAGES_FILE)
-
         self.__msg_dict: Dict[str, Tuple[List[str], int]] = {  # Messages for each section of the conductor
             "START GAME"         : (list(Messages.START_GAME), Colors.return_pair_for_index(Colors.START_GAME[1])),
             "START ROUND"        : (list(Messages.START_ROUND), Colors.return_pair_for_index(Colors.START_ROUND[1])),

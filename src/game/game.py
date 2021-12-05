@@ -20,6 +20,7 @@ class Game:
         self.__window = None
         self.__hangman_pad = None
         self.__game_setting_pad = None
+        self.__query_game_pad = None
 
     @property
     def window(self):
@@ -51,6 +52,16 @@ class Game:
         """ Set a new value to the attribute game_setting_pad """
         self.__game_setting_pad = new_value
 
+    @property
+    def query_game_pad(self):
+        """ Return the pad of the ask difficulty query """
+        return self.__query_game_pad
+
+    @query_game_pad.setter
+    def query_game_pad(self, new_value) -> None:
+        """ Set a new value for the attribute query_game_pad """
+        self.__query_game_pad = new_value
+
     def initialize_window(self) -> curses.window:
         """ Initialize the game creating the game window """
         game_window = curses.newwin(self.__gwin_h - 1, self.__gwin_w, self.__gwin_y, self.__gwin_x)
@@ -72,9 +83,33 @@ class Game:
 
         return game_window
 
-    def add_query_game(self) -> None:
+    def add_query_game(self) -> curses.window:
         """ Ask the user if he is ready to start the game and ask also the difficulty """
+        ask_pad = curses.newpad(100, 100)
+        ask_pad.clear()
+        ask_pad.nodelay(True)
 
+        difficulties = ["Easy", "Medium", "Hard", "Very Hard"]
+        ask_pad.addstr(0, 0, Messages.ASK_DIFFICULTY + ":", curses.A_BOLD)
+
+        initial_pos = pos_x = (len(Messages.ASK_DIFFICULTY) - len("    ".join(difficulties))) // 2
+        for i, diff in enumerate(difficulties):
+            if i == 0:
+                ask_pad.attron(curses.A_BLINK | curses.A_REVERSE)
+
+            ask_pad.addstr(2, pos_x, diff.upper())
+
+            if i == 0:
+                ask_pad.attroff(curses.A_BLINK | curses.A_REVERSE)
+
+            pos_x += len(diff) + 4
+
+        ask_pad.move(2, initial_pos - 1)
+
+        y, x = self.__gwin_y + 2, (self.__gwin_w - len(Messages.ASK_DIFFICULTY)) // 2
+        ask_pad.noutrefresh(0, 0, y, x, y + 2, x + len(Messages.ASK_DIFFICULTY))
+
+        return ask_pad
 
     def add_hangman_pad(self) -> curses.window:
         """ Add the pad for the hangman """

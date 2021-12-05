@@ -12,7 +12,6 @@ class System:
     PATH_SPLITTER   : str = "\\" if sys.platform == "win32" else "/"
     SCIFI_MUSIC     : str = osp.join(PATH_SPLITTER.join(__file__.split(PATH_SPLITTER)[:-2]), "music/scifi.mp3")
     TYPEWRITER_MUSIC: str = osp.join(PATH_SPLITTER.join(__file__.split(PATH_SPLITTER)[:-2]), "music/writer.mp3")
-    MESSAGES_FILE   : str = osp.join(PATH_SPLITTER.join(__file__.split(PATH_SPLITTER)[:-2]), "conductor/messages.txt")
     WORDS_FILE      : str = osp.join(PATH_SPLITTER.join(__file__.split(PATH_SPLITTER)[:-2]), "word/words_ita.txt")
 
 
