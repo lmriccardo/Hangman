@@ -79,7 +79,7 @@ class TerminalHangman:
 		curses.doupdate()
 
 		diff = self.__game.get_difficulty(self.__stdscr)
-		print(diff)
+		self.__game.game_settings.change_game_difficulty(diff)
 
 		# game_hangman_pad = self.__game.add_hangman_pad()
 		# self.__game.hangman_pad = game_hangman_pad

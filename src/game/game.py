@@ -62,6 +62,11 @@ class Game:
         """ Set a new value for the attribute query_game_pad """
         self.__query_game_pad = new_value
 
+    @property
+    def game_settings(self) -> GameSetting:
+        """ Return the game setting object """
+        return self.__game_settings
+
     def initialize_window(self) -> curses.window:
         """ Initialize the game creating the game window """
         game_window = curses.newwin(self.__gwin_h - 1, self.__gwin_w, self.__gwin_y, self.__gwin_x)
@@ -144,8 +149,34 @@ class Game:
                     # Unset attribute
                     self.__query_game_pad.addstr(2, previous_position_x, difficulties[previous_diff_idx].upper())
 
+                    diff_infos = Messages.INFO_DIFFICULTY
+                    tmp_game_settings = GameSetting(difficulties[current_diff_idx])
+                    w_len = tmp_game_settings.get_word_lenght()
+                    n_hint = tmp_game_settings.get_number_of_hints()
+                    formatting_value = (
+                        (tmp_game_settings.get_intro(), tmp_game_settings.get_game_difficulty()),
+                        (tmp_game_settings.get_max_time_per_round(),),
+                        (tmp_game_settings.get_total_round_number(), tmp_game_settings.get_max_round_score()),
+                        (", ".join(list(map(str, range(w_len[0], w_len[1] + 1)))), tmp_game_settings.get_penalty()),
+                        (),
+                        (", ".join(list(map(str, range(n_hint[0], n_hint[1] + 1)))), tmp_game_settings.get_hint_penalty()),
+                        (),
+                        ()
+                    )
+
+                    max_len = 0
+                    for i, current_info in enumerate(diff_infos):
+                        formatted_info = current_info
+                        if formatting_value[i] != ():
+                            formatted_info = formatted_info.format(*list(formatting_value[i]))
+
+                        if (curr_len := len(formatted_info)) > max_len:
+                            max_len = curr_len
+
+                        self.__query_game_pad.addstr(6 + i, 0, formatted_info, curses.A_BOLD)
+
                     y, x = self.__gwin_y + 2, (self.__gwin_w - len(Messages.ASK_DIFFICULTY)) // 2
-                    self.__query_game_pad.refresh(0, 0, y, x, y + 2, x + len(Messages.ASK_DIFFICULTY))
+                    self.__query_game_pad.refresh(0, 0, y, x, y + 8 + len(formatting_value), x + max_len)
 
             except curses.error:
                 ...

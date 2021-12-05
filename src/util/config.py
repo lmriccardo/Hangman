@@ -56,12 +56,14 @@ class Messages:
     )
 
     INFO_DIFFICULTY   : Tuple[str] = (
-        "{intro} ... Do You wanna something {diff}?",
-        "Ok, Let's do it ... Remember you have {time_per_round} minute per round",
-        "Up to {nround} round, with max score each of {max_score} (in percentage)",
-        "The word queried can be {length} lenght, and for each wrong guess {penalty}",
+        "{0} ... Do You wanna something {1}?",
+        "Ok, Let's do it ... Remember you have {0} seconds per round",
+        "Up to {0} round, with max score each of {1} (in percentage)",
+        "The word queried can be {0} lenght, and for each wrong guess {1}",
         "part of the body will be added to the hangman.",
-        "You can have {hints} hint, and for each used hint you will have {hint_penalty}"
+        "You can have {0} hint, and for each used hint you will have {1} penalty.",
+        "The hint penalty regard the total score. In fact, from the total score",
+        "a scalar of (len of the current word) / (max number of hint * 100) for each used hint"
     )
 
 
