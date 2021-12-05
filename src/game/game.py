@@ -21,6 +21,7 @@ class Game:
         self.__hangman_pad = None
         self.__game_setting_pad = None
         self.__query_game_pad = None
+        self.__description_diff_game_pad = None
 
     @property
     def window(self):
@@ -90,7 +91,7 @@ class Game:
 
     def add_query_game(self) -> curses.window:
         """ Ask the user if he is ready to start the game and ask also the difficulty """
-        ask_pad = curses.newpad(100, 100)
+        ask_pad = curses.newpad(100, self.__gwin_w)
         ask_pad.clear()
         ask_pad.nodelay(True)
 
@@ -121,6 +122,7 @@ class Game:
         difficulties = ["Easy", "Medium", "Hard", "Very Hard"]
         current_diff_idx = previous_diff_idx = 0
         current_position_x = previous_position_x = (len(Messages.ASK_DIFFICULTY) - len("   ".join(difficulties))) // 2
+        self.__description_diff_game_pad = curses.newpad(100, self.__gwin_w)
         while True:
             try:
 
@@ -128,7 +130,8 @@ class Game:
 
                 # If the user has pressed ENTER, return the current difficulty
                 if key == "\n":
-                    return difficulties[current_diff_idx].upper()
+                    self.clear_select_diff()
+                    return difficulties[current_diff_idx]
 
                 previous_diff_idx = current_diff_idx
                 previous_position_x = current_position_x
@@ -164,22 +167,36 @@ class Game:
                         ()
                     )
 
-                    max_len = 0
+                    y, x = self.__gwin_y + 2, (self.__gwin_w - len(Messages.ASK_DIFFICULTY)) // 2
+                    self.__query_game_pad.refresh(0, 0, y, x, y + 2, x + len(Messages.ASK_DIFFICULTY))
+
+                    self.__description_diff_game_pad.erase()
                     for i, current_info in enumerate(diff_infos):
                         formatted_info = current_info
                         if formatting_value[i] != ():
                             formatted_info = formatted_info.format(*list(formatting_value[i]))
 
-                        if (curr_len := len(formatted_info)) > max_len:
-                            max_len = curr_len
+                        self.__description_diff_game_pad.addstr(i, 0, formatted_info, curses.A_BOLD)
 
-                        self.__query_game_pad.addstr(6 + i, 0, formatted_info, curses.A_BOLD)
-
-                    y, x = self.__gwin_y + 2, (self.__gwin_w - len(Messages.ASK_DIFFICULTY)) // 2
-                    self.__query_game_pad.refresh(0, 0, y, x, y + 8 + len(formatting_value), x + max_len)
+                    # 97 is the maximum length of the maximum description line upon all descrs.
+                    descr_pos_y, descr_pos_x = y + 10, (curses.COLS - 1 - 97) // 2
+                    descr_pos_by, descr_pos_bx = descr_pos_y + len(formatting_value), descr_pos_x + 97
+                    self.__description_diff_game_pad.refresh(0, 0, descr_pos_y, descr_pos_x, descr_pos_by, descr_pos_bx)
 
             except curses.error:
                 ...
+
+    def clear_select_diff(self) -> None:
+        """ Clear and delete the pads used for the diffculty selection """
+        self.__query_game_pad.clear()
+        self.__description_diff_game_pad.clear()
+
+        upper_left_y, upper_left_x = self.__gwin_y + 1, self.__gwin_x + 1
+        botton_right, botton_right_x = self.__gwin_y + self.__gwin_h - 3, self.__gwin_x + self.__gwin_w
+        self.__description_diff_game_pad.refresh(0, 0, upper_left_y, upper_left_x, botton_right, botton_right_x)
+        self.__query_game_pad.refresh(0, 0, upper_left_y, upper_left_x, botton_right, botton_right_x)
+        del self.__description_diff_game_pad
+        del self.__query_game_pad
 
     def add_hangman_pad(self) -> curses.window:
         """ Add the pad for the hangman """

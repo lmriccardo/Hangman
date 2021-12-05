@@ -73,7 +73,7 @@ class Conductor:
                 self.__window.addstr(2 + i, j, char, color | curses.A_BOLD)
                 j += 1
                 self.__window.refresh()
-                time.sleep(0.005)
+                time.sleep(0.05)
 
         # elf.__window.refresh()
         self.__music_thread.terminate()
