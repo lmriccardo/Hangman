@@ -1,7 +1,5 @@
 from typing import List, Optional, Tuple
 from src.util.config import GameSettings
-from src.word.oracle import WordOracle
-import random
 
 
 class GameSetting:
@@ -105,21 +103,18 @@ class GameStatus:
         """ The init method """
         self.__game_settings = settings  # The current settings of the game
 
-        self.__round = 0                     # The current round
-        self.__word  = ""                    # The current word to guess
+        self.__round = 0                      # The current round
+        self.__word  = ""                     # The current word to guess
         self.__number_of_guessed_letters = 0  # How many letters the player has guessed
-        self.__number_of_wrong_letters = 0   # How many letters the player has guessed wrong
-        self.__score = 0                     # The user score
-        self.__penalty = 0                   # Number of obtained penalty
+        self.__number_of_wrong_letters = 0    # How many letters the player has guessed wrong
+        self.__score = 0                      # The user score
+        self.__penalty = 0                    # Number of obtained penalty
 
         self.__len_current_word = 0      # The length of the current word that has to be guessed
         self.__number_of_used_hints = 0  # Number of used hints
 
         # The state of the current word = _ for unknow letters, chr for known or guessed
         self.__word_state: List[str] = ["_"] * self.__len_current_word
-
-        # Define the oracle
-        self.__word_gen = WordOracle()
 
     @property
     def game_settings(self):
@@ -181,6 +176,16 @@ class GameStatus:
         self.__score = new_value
 
     @property
+    def penalty(self) -> int:
+        """ Return the penalty counter """
+        return self.__penalty
+
+    @penalty.setter
+    def penalty(self, new_value: int) -> None:
+        """ Set a new value for the attribute penalty """
+        self.__penalty = new_value
+
+    @property
     def len_current_word(self) -> int:
         """ Return the length of the current word """
         return self.__len_current_word
@@ -195,11 +200,28 @@ class GameStatus:
         """ Set a new value for the attribute number_of_used_hints """
         self.__number_of_used_hints = new_value
 
-    def next_round(self) -> None:
+    def next_round(self, word: str) -> None:
         """
         Start a new round updating the current state with a new state:
-        1. picks a new word randomically
-        2. increments the round counter
-        3. reset all the other counter
-        4. do other useful but uninteresting stuff
+        1. increments the round counter
+        2. reset all the other counter
+        3. do other useful but uninteresting stuff
         """
+        self.__word = word
+        self.__len_current_word = len(self.__word)
+        self.__round += 1
+        self.__number_of_used_hints = 0
+        self.__number_of_wrong_letters = 0
+        self.__penalty = 0
+
+        # We set some letters of the word_state to clear depending on the difficulty
+        self.__word_state = ["_"] * self.__len_current_word
+        if self.__game_settings.get_game_difficulty() in ["Hard", "Very Hard"]:
+            self.__word_state[0] = self.__word[0]
+            self.__word_state[len(self.__word)//2] = self.__word[len(self.__word) // 2]
+            self.__word_state[-1] = self.__word[-1]
+        elif self.__game_settings.get_game_difficulty() == "Easy":
+            self.__word_state[0] = self.__word[0]
+        else:
+            self.__word_state[0] = self.__word[0]
+            self.__word_state[-1] = self.__word[-1]

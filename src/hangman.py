@@ -89,6 +89,9 @@ class TerminalHangman:
 		game_settings_pad = self.__game.add_game_setting_pad()
 		self.__game.game_setting_pad = game_settings_pad
 
+		game_status_pad = self.__game.add_game_status_pad()
+		self.__game.game_status_pad = game_status_pad
+
 		curses.doupdate()
 
 	def _start_game(self) -> None:

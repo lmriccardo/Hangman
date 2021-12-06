@@ -22,6 +22,7 @@ class Game:
         self.__game_setting_pad = None
         self.__query_game_pad = None
         self.__description_diff_game_pad = None
+        self.__game_status_pad = None
 
     @property
     def window(self):
@@ -67,6 +68,16 @@ class Game:
     def game_settings(self) -> GameSetting:
         """ Return the game setting object """
         return self.__game_settings
+
+    @property
+    def game_status_pad(self):
+        """ Return the pad of the game status """
+        return self.__game_status_pad
+
+    @game_status_pad.setter
+    def game_status_pad(self, new_value) -> None:
+        """ Set the value for the attribute game_status_pad """
+        self.__game_status_pad = new_value
 
     def initialize_window(self) -> curses.window:
         """ Initialize the game creating the game window """
@@ -216,7 +227,7 @@ class Game:
         	rarm=AsciiArt.HANGMAN_RIGHT_ARM, lleg=AsciiArt.HANGMAN_LEFT_LEG, rleg=AsciiArt.HANGMAN_RIGHT_LEG,
         	lfoot=AsciiArt.HANGMAN_FOOT, rfoot=AsciiArt.HANGMAN_FOOT
         ), curses.A_BOLD)
-        hangman_pad.noutrefresh(0, 0, self.__gwin_y + 2, self.__gwin_x + 4, self.__gwin_y + 16, self.__gwin_x + 22)
+        hangman_pad.noutrefresh(0, 0, self.__gwin_y + 2, self.__gwin_x + 4, self.__gwin_y + 14, self.__gwin_x + 22)
 
         return hangman_pad
 
@@ -224,8 +235,8 @@ class Game:
         """ Add the pad for displaying the game settings """
         settings_pad = curses.newpad(100, 100)
         settings_pad.nodelay(True)
-        rectangle(self.__window, 2, self.__gwin_w // 2 + 27, 12, self.__gwin_w - 7)
-        self.__window.addstr(2, self.__gwin_w // 2 + 29, f"GAME SETTINGS", Colors.return_pair_for_index(Colors.TITLE[1]) | curses.A_UNDERLINE)
+        rectangle(self.__window, 4, self.__gwin_w // 2 + 27, 14, self.__gwin_w - 7)
+        self.__window.addstr(4, self.__gwin_w // 2 + 29, "GAME SETTINGS", Colors.return_pair_for_index(Colors.TITLE[1]) | curses.A_UNDERLINE)
         self.__window.noutrefresh()
 
         settings_pad.clear()
@@ -249,9 +260,35 @@ class Game:
         settings_pad.addstr(7, 0, f"{GameSettings.HINT_NUMBER} Range: {hints_range}")
         settings_pad.addstr(8, 0, f"{GameSettings.HINT_PENALTY}: x{self.__game_settings.get_hint_penalty()}")
 
-        settings_pad.noutrefresh(0, 0, self.__gwin_y + 3, self.__gwin_w // 2 + 31, self.__gwin_y + 10, self.__gwin_w - 8)
+        settings_pad.noutrefresh(0, 0, self.__gwin_y + 5, self.__gwin_w // 2 + 31, self.__gwin_y + 12, self.__gwin_w - 8)
 
         return settings_pad
 
     def add_game_status_pad(self) -> curses.window:
         """ Add the pad for displaying the current status of the game """
+        game_status_pad = curses.newpad(100, 100)
+        game_status_pad.nodelay(True)
+        rectangle(self.__window, 19, self.__gwin_w // 2 + 27, 26, self.__gwin_w - 7)
+        self.__window.addstr(19, self.__gwin_w // 2 + 29, "GAME STATUS", Colors.return_pair_for_index(Colors.TITLE[1]) | curses.A_UNDERLINE)
+        self.__window.noutrefresh()
+
+        return game_status_pad
+
+    def update_status(self) -> None:
+        """ Update the status of the game_status_pad adding the new value """
+        current_round     = self.__game_status.round
+        n_guessed_letters = self.__game_status.number_of_guessed_letters
+        n_wrong_try       = self.__game_status.number_of_wrong_letters
+        word_len          = self.__game_status.len_current_word
+        n_used_hints      = self.__game_status.number_of_used_hints
+        current_score     = self.__game_status.score
+
+        self.__game_status_pad.clear()
+        self.__game_status_pad.addstr(1, 0, f"CURRENT ROUND: {current_round}")
+        self.__game_status_pad.addstr(2, 0, f"NUMBER OF GUESSED LETTERS: {n_guessed_letters}")
+        self.__game_status_pad.addstr(3, 0, f"NUMBER OF WRONG TRY: {n_wrong_try}")
+        self.__game_status_pad.addstr(4, 0, f"CURRENT WORD LENGTH: {word_len}")
+        self.__game_status_pad.addstr(5, 0, f"NUMBER OF USED HINTS: {n_used_hints}")
+        self.__game_status_pad.addstr(6, 0, f"CURRENT TOTAL SCORE: {current_score}")
+
+        self.__game_status_pad.noutresfresh(0, 0, 21, self.__gwin_w // 2 + 29, )
