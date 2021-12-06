@@ -1,5 +1,6 @@
 from typing import List, Optional, Tuple
 from src.util.config import GameSettings
+from src.word.oracle import WordOracle
 import random
 
 
@@ -77,6 +78,16 @@ class GameSetting:
         """ Change the game difficulty and set new settings """
         self.__settings = GameSettings.get_settings(new_difficulty)
 
+    def map_wordlen_maxhints(self, wordlen: int) -> int:
+        """ Return the maximum number of hints for a given word len """
+        wordlen_sett = self.__settings[GameSettings.WORD_LENGTH]
+        wordlen_ranges = list(range(wordlen_sett[0], wordlen_sett[1] + 1))
+
+        hints_sett = self.__settings[GameSettings.HINT_NUMBER]
+        hints_range = list(range(hints_sett[0], hints_sett[1] + 1))
+
+        return hints_range[wordlen_ranges.index(wordlen)]
+
 
 class GameStatus:
     """
@@ -84,17 +95,36 @@ class GameStatus:
     - current round
     - current word
     - number of guessed letters
+    - number of wrong guessed letters
     - state of the word to guess
-    - current selected "textbox"
-    - game difficulty (Easy, Medium, Hard, Very Hard)
+    - game settings
+    - length of the current word to guess
+    - number of hints
     """
-    def __init__(self, round: int, word: str, nguessed_char: int = 0) -> None:
+    def __init__(self, settings: GameSetting) -> None:
         """ The init method """
-        self.__round = round                                     # The current round
-        self.__word  = word                                      # The current word to guess
-        self.__number_of_guessed_lettes = nguessed_char          # How many letters the player has guessed
-        self.__word_state: List[str] = ["_"] * len(self.__word)  # The state of the current word = _ for unknow letters, chr for known or guessed
-        self.__score = 0                                         # The user score
+        self.__game_settings = settings  # The current settings of the game
+
+        self.__round = 0                     # The current round
+        self.__word  = ""                    # The current word to guess
+        self.__number_of_guessed_letters = 0  # How many letters the player has guessed
+        self.__number_of_wrong_letters = 0   # How many letters the player has guessed wrong
+        self.__score = 0                     # The user score
+        self.__penalty = 0                   # Number of obtained penalty
+
+        self.__len_current_word = 0      # The length of the current word that has to be guessed
+        self.__number_of_used_hints = 0  # Number of used hints
+
+        # The state of the current word = _ for unknow letters, chr for known or guessed
+        self.__word_state: List[str] = ["_"] * self.__len_current_word
+
+        # Define the oracle
+        self.__word_gen = WordOracle()
+
+    @property
+    def game_settings(self):
+        """ Return the current game settings """
+        return self.__game_settings
 
     @property
     def round(self) -> int:
@@ -102,29 +132,43 @@ class GameStatus:
         return self.__round
 
     @round.setter
-    def round(self, new_round) -> None:
-        """ Set the value of round """
-        self.__round = new_round
+    def round(self, new_value) -> None:
+        """ Update the value of the attribute round """
+        self.__round = new_value
 
     @property
     def word(self) -> str:
         """ Return the current word to guess """
         return self.__word
 
-    @word.setter
-    def word(self, new_word) -> None:
-        """ Set the value for word """
-        self.__word = new_word
+    @property
+    def number_of_guessed_letters(self) -> int:
+        """ Return the number of letters the user has guessed """
+        return self.__number_of_guessed_letters
+
+    @number_of_guessed_letters.setter
+    def number_of_guessed_letters(self, new_value: int) -> None:
+        """ Update the value of the attribute number_of_guessed_letters """
+        self.__number_of_guessed_letters = new_value
 
     @property
-    def number_of_guessed_lettes(self) -> int:
-        """ Return the number of letters the user has guessed """
-        return self.__number_of_guessed_lettes
+    def number_of_wrong_letters(self) -> int:
+        """ Return the number of wrong guess """
+        return self.__number_of_wrong_letters
 
-    @number_of_guessed_lettes.setter
-    def number_of_guessed_lettes(self, new_value) -> None:
-        """ Set the value of the number ... """
-        self.__number_of_guessed_lettes = new_value
+    @number_of_wrong_letters.setter
+    def number_of_wrong_letters(self, new_value: int) -> None:
+        """ Update the value of the attribute number_of_wrong_letters """
+        self.__number_of_wrong_letters = new_value
+
+    @property
+    def word_state(self) -> List[str]:
+        """ Return the state of the current word, i.e., which letters have been guessed """
+        return self.__word_state
+
+    def update_word_state(self, idx: int, letter: str) -> None:
+        """ Update the state of the word inserting in the index idx the letter "letter" """
+        self.__word_state[idx] = letter
 
     @property
     def score(self) -> int:
@@ -132,6 +176,30 @@ class GameStatus:
         return self.__score
 
     @score.setter
-    def score(self, new_score) -> None:
-        """ Add a new score """
-        self.__score += new_score
+    def score(self, new_value) -> None:
+        """ Set a new value for score """
+        self.__score = new_value
+
+    @property
+    def len_current_word(self) -> int:
+        """ Return the length of the current word """
+        return self.__len_current_word
+
+    @property
+    def number_of_used_hints(self) -> int:
+        """ Return the number of used hint """
+        return self.__number_of_used_hints
+
+    @number_of_used_hints.setter
+    def number_of_used_hints(self, new_value) -> None:
+        """ Set a new value for the attribute number_of_used_hints """
+        self.__number_of_used_hints = new_value
+
+    def next_round(self) -> None:
+        """
+        Start a new round updating the current state with a new state:
+        1. picks a new word randomically
+        2. increments the round counter
+        3. reset all the other counter
+        4. do other useful but uninteresting stuff
+        """

@@ -10,8 +10,8 @@ class Game:
     def __init__(self, conductor: Conductor) -> None:
         """ The init method """
         self.__conductor = conductor  # The conductor object
-        self.__game_status = GameStatus(round=0, word="")  # The status of the game
         self.__game_settings = GameSetting()
+        self.__game_status = GameStatus(settings=self.__game_settings)  # The status of the game
 
         self.__gwin_w, self.__gwin_h = curses.COLS - 2, curses.LINES - 21
         self.__gwin_x, self.__gwin_y = 1, 21
@@ -81,7 +81,7 @@ class Game:
         game_window.attroff(color_pair)
 
         game_window.addstr(
-            0, 3, f"Hangman Game - {self.__game_settings.get_game_difficulty()} Mode",
+            0, 3, "Hangman Game",
             Colors.return_pair_for_index(Colors.TITLE[1]) | curses.A_UNDERLINE
         )
 
@@ -186,13 +186,21 @@ class Game:
             except curses.error:
                 ...
 
+    def update_window_title(self) -> None:
+        """ simply update the title of the window with the right difficulty """
+        self.__window.addstr(
+            0, 3, f"Hangman Game - {self.__game_settings.get_game_difficulty()} Mode",
+            Colors.return_pair_for_index(Colors.TITLE[1]) | curses.A_UNDERLINE
+        )
+        self.__window.noutrefresh()
+
     def clear_select_diff(self) -> None:
         """ Clear and delete the pads used for the diffculty selection """
         self.__query_game_pad.clear()
         self.__description_diff_game_pad.clear()
 
         upper_left_y, upper_left_x = self.__gwin_y + 1, self.__gwin_x + 1
-        botton_right, botton_right_x = self.__gwin_y + self.__gwin_h - 3, self.__gwin_x + self.__gwin_w
+        botton_right, botton_right_x = self.__gwin_y + self.__gwin_h - 3, self.__gwin_x + self.__gwin_w - 2
         self.__description_diff_game_pad.refresh(0, 0, upper_left_y, upper_left_x, botton_right, botton_right_x)
         self.__query_game_pad.refresh(0, 0, upper_left_y, upper_left_x, botton_right, botton_right_x)
         del self.__description_diff_game_pad
@@ -216,8 +224,8 @@ class Game:
         """ Add the pad for displaying the game settings """
         settings_pad = curses.newpad(100, 100)
         settings_pad.nodelay(True)
-        rectangle(self.__window, 2, self.__gwin_w // 2, 12, self.__gwin_w - 7)
-        self.__window.addstr(2, self.__gwin_w // 2 + 3, f"GAME SETTINGS", Colors.return_pair_for_index(Colors.TITLE[1]) | curses.A_UNDERLINE)
+        rectangle(self.__window, 2, self.__gwin_w // 2 + 27, 12, self.__gwin_w - 7)
+        self.__window.addstr(2, self.__gwin_w // 2 + 29, f"GAME SETTINGS", Colors.return_pair_for_index(Colors.TITLE[1]) | curses.A_UNDERLINE)
         self.__window.noutrefresh()
 
         settings_pad.clear()
@@ -241,6 +249,9 @@ class Game:
         settings_pad.addstr(7, 0, f"{GameSettings.HINT_NUMBER} Range: {hints_range}")
         settings_pad.addstr(8, 0, f"{GameSettings.HINT_PENALTY}: x{self.__game_settings.get_hint_penalty()}")
 
-        settings_pad.noutrefresh(0, 0, self.__gwin_y + 3, self.__gwin_w // 2 + 4, self.__gwin_y + 10, self.__gwin_w - 8)
+        settings_pad.noutrefresh(0, 0, self.__gwin_y + 3, self.__gwin_w // 2 + 31, self.__gwin_y + 10, self.__gwin_w - 8)
 
         return settings_pad
+
+    def add_game_status_pad(self) -> curses.window:
+        """ Add the pad for displaying the current status of the game """

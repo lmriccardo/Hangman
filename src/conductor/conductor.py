@@ -20,17 +20,17 @@ class Conductor:
         }
 
         self.__window = None
+        self.__conductor_pad = None
+
+        # If there is at least a message in the pad
+        self.__thereis_message: bool = False
+        self.__messages_current_max_len: int = 0
+        self.__messages_current_max_h: int = 0
 
         # Get the sound of the typewriter
         self.__type_writer_sound = pydub.AudioSegment.from_mp3(System.TYPEWRITER_MUSIC)[:-100]
         self.__type_writer_sound += self.__type_writer_sound * 6 + self.__type_writer_sound[:-1000]
         self.__type_writer_sound -= 30
-        self.__music_thread = multiprocessing.Process(target=playbck.play, args=(self.__type_writer_sound,))
-
-    @property
-    def music_thread(self) -> multiprocessing.Process:
-        """ Return the Process object for the music player """
-        return self.__music_thread
 
     @property
     def window(self):
@@ -42,8 +42,18 @@ class Conductor:
         """ Set the new value for the attribute window """
         self.__window = new_value
 
+    @property
+    def conductor_pad(self):
+        """ Return the pad where the conductor write messages """
+        return self.__conductor_pad
+
+    @conductor_pad.setter
+    def conductor_pad(self, new_value) -> None:
+        """ Set a new value for the attribute conductor_pad """
+        self.__conductor_pad = new_value
+
     @staticmethod
-    def initialize_container() -> curses.window:
+    def initialize_container() -> Tuple[curses.window]:
         """ Initialize the new container for the conductor messages """
         y_postion = 2 + len(AsciiArt.TITLE.split("\n")) + 1 # The +2s are the padding
         conductor_window = curses.newwin(11, curses.COLS - 2, y_postion, 1)
@@ -52,7 +62,9 @@ class Conductor:
         conductor_window.addstr(0, 3, "Conductor", Colors.return_pair_for_index(Colors.TITLE[1]) | curses.A_UNDERLINE)
         conductor_window.noutrefresh()
 
-        return conductor_window
+        conductor_pad = curses.newpad(100, 100)
+
+        return conductor_window, conductor_pad
 
     @staticmethod
     def add_condactor_art() -> None:
@@ -64,16 +76,32 @@ class Conductor:
 
     def print(self, section: str) -> None:
         """ Print the messages of the corresponding section """
-        self.__music_thread.start()
+        music_thread = multiprocessing.Process(target=playbck.play, args=(self.__type_writer_sound,))
+        music_thread.start()
         lines, color = self.__msg_dict[section]
+        y_postion = 2 + len(AsciiArt.TITLE.split("\n")) + 1
+        max_len = 0
+        max_heigth = 0
+
+        # First clear
+        if self.__thereis_message:
+            self.__conductor_pad.clear()
+            self.__conductor_pad.refresh(0, 0, y_postion + 2, 2, self.__messages_current_max_h, self.__messages_current_max_len + 1)
 
         for i, line in enumerate(lines):
             j = 3
             for char in line:
-                self.__window.addstr(2 + i, j, char, color | curses.A_BOLD)
+                self.__conductor_pad.addstr(i, j, char, color | curses.A_BOLD)
                 j += 1
-                self.__window.refresh()
-                time.sleep(0.05)
+                if j > max_len:
+                    max_len = j
 
-        # elf.__window.refresh()
-        self.__music_thread.terminate()
+                max_heigth = y_postion + 2 + i
+                self.__conductor_pad.refresh(0, 0, y_postion + 2, 2, max_heigth, max_len + 1)
+                time.sleep(0.005)
+
+        self.__thereis_message = True
+        self.__messages_current_max_len = max_len
+        self.__messages_current_max_h = max_heigth
+
+        music_thread.terminate()

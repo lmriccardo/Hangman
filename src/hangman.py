@@ -28,7 +28,7 @@ class TerminalHangman:
 		self.__background_music -= 20
 		self.__bckgrd_music_thread = multiprocessing.Process(target=playbck.play, args=(self.__background_music,))
 
-		self.__processes: List[multiprocessing.Process] = [self.__bckgrd_music_thread, self.__conductor.music_thread]
+		self.__processes: List[multiprocessing.Process] = [self.__bckgrd_music_thread]
 
 	def __show_title(self) -> None:
 		""" Show the title of the game """
@@ -51,8 +51,9 @@ class TerminalHangman:
 	def __show_conductor(self) -> None:
 		""" Show the conductor """
 		# Initialize the conductor window
-		conductor_window = Conductor.initialize_container()
+		conductor_window, conductor_pad = Conductor.initialize_container()
 		self.__conductor.window = conductor_window
+		self.__conductor.conductor_pad = conductor_pad
 
 		# Create the pad in which insert the ASCII Art of the conductor
 		self.__conductor.add_condactor_art()
@@ -80,6 +81,7 @@ class TerminalHangman:
 
 		diff = self.__game.get_difficulty(self.__stdscr)
 		self.__game.game_settings.change_game_difficulty(diff)
+		self.__game.update_window_title()
 
 		game_hangman_pad = self.__game.add_hangman_pad()
 		self.__game.hangman_pad = game_hangman_pad
