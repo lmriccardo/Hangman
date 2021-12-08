@@ -23,6 +23,7 @@ class Game:
         self.__query_game_pad = None
         self.__description_diff_game_pad = None
         self.__game_status_pad = None
+        self.__game_log_pad = None
 
     @property
     def window(self):
@@ -70,6 +71,11 @@ class Game:
         return self.__game_settings
 
     @property
+    def game_status(self) -> GameStatus:
+        """ Return the status of the game """
+        return self.__game_status
+
+    @property
     def game_status_pad(self):
         """ Return the pad of the game status """
         return self.__game_status_pad
@@ -78,6 +84,16 @@ class Game:
     def game_status_pad(self, new_value) -> None:
         """ Set the value for the attribute game_status_pad """
         self.__game_status_pad = new_value
+
+    @property
+    def game_log_pad(self):
+        """ Return the log pad of the game """
+        return self.__game_log_pad
+
+    @game_log_pad.setter
+    def game_log_pad(self, new_value) -> None:
+        """ Set a new value for the attribute game_log_pad """
+        self.__game_log_pad = new_value
 
     def initialize_window(self) -> curses.window:
         """ Initialize the game creating the game window """
@@ -223,11 +239,11 @@ class Game:
         hangman_pad.nodelay(True)
         hangman_pad.clear()
         hangman_pad.addstr(AsciiArt.HANGMAN.format(
-        	head=AsciiArt.HANGMAN_HEAD, larm=AsciiArt.HANGMAN_LEFT_ARM, body=AsciiArt.HANGMAN_BODY,
-        	rarm=AsciiArt.HANGMAN_RIGHT_ARM, lleg=AsciiArt.HANGMAN_LEFT_LEG, rleg=AsciiArt.HANGMAN_RIGHT_LEG,
-        	lfoot=AsciiArt.HANGMAN_FOOT, rfoot=AsciiArt.HANGMAN_FOOT
+        	head="", larm="", body="",
+        	rarm="", lleg="", rleg="",
+        	lfoot="", rfoot=""
         ), curses.A_BOLD)
-        hangman_pad.noutrefresh(0, 0, self.__gwin_y + 2, self.__gwin_x + 4, self.__gwin_y + 14, self.__gwin_x + 22)
+        hangman_pad.noutrefresh(0, 0, self.__gwin_y + 4, self.__gwin_x + 5, self.__gwin_y + 15, self.__gwin_x + 23)
 
         return hangman_pad
 
@@ -268,7 +284,7 @@ class Game:
         """ Add the pad for displaying the current status of the game """
         game_status_pad = curses.newpad(100, 100)
         game_status_pad.nodelay(True)
-        rectangle(self.__window, 19, self.__gwin_w // 2 + 27, 26, self.__gwin_w - 7)
+        rectangle(self.__window, 19, self.__gwin_w // 2 + 27, 28, self.__gwin_w - 7)
         self.__window.addstr(19, self.__gwin_w // 2 + 29, "GAME STATUS", Colors.return_pair_for_index(Colors.TITLE[1]) | curses.A_UNDERLINE)
         self.__window.noutrefresh()
 
@@ -284,11 +300,21 @@ class Game:
         current_score     = self.__game_status.score
 
         self.__game_status_pad.clear()
-        self.__game_status_pad.addstr(1, 0, f"CURRENT ROUND: {current_round}")
-        self.__game_status_pad.addstr(2, 0, f"NUMBER OF GUESSED LETTERS: {n_guessed_letters}")
-        self.__game_status_pad.addstr(3, 0, f"NUMBER OF WRONG TRY: {n_wrong_try}")
-        self.__game_status_pad.addstr(4, 0, f"CURRENT WORD LENGTH: {word_len}")
-        self.__game_status_pad.addstr(5, 0, f"NUMBER OF USED HINTS: {n_used_hints}")
-        self.__game_status_pad.addstr(6, 0, f"CURRENT TOTAL SCORE: {current_score}")
+        self.__game_status_pad.addstr(0, 2, f"CURRENT ROUND: {current_round}")
+        self.__game_status_pad.addstr(1, 2, f"NUMBER OF GUESSED LETTERS: {n_guessed_letters}")
+        self.__game_status_pad.addstr(2, 2, f"NUMBER OF WRONG TRY: {n_wrong_try}")
+        self.__game_status_pad.addstr(3, 2, f"CURRENT WORD LENGTH: {word_len}")
+        self.__game_status_pad.addstr(4, 2, f"NUMBER OF USED HINTS: {n_used_hints}")
+        self.__game_status_pad.addstr(5, 2, f"CURRENT TOTAL SCORE: {current_score}")
 
-        self.__game_status_pad.noutresfresh(0, 0, 21, self.__gwin_w // 2 + 29, )
+        self.__game_status_pad.noutrefresh(0, 0, self.__gwin_y + 21, self.__gwin_w // 2 + 29, self.__gwin_y + 27, self.__gwin_w - 8)
+
+    def add_log_pad(self) -> curses.window:
+        """ Add the pad for logging what the user has done """
+        log_pad = curses.newpad(100, 100)
+        log_pad.nodelay(True)
+        rectangle(self.__window, 19, 4, 28, self.__gwin_w // 2 + 20)
+        self.__window.addstr(19, 6, "GAME LOG", Colors.return_pair_for_index(Colors.TITLE[1]) | curses.A_UNDERLINE)
+        self.__window.noutrefresh()
+
+        return log_pad

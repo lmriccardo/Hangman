@@ -91,6 +91,10 @@ class TerminalHangman:
 
 		game_status_pad = self.__game.add_game_status_pad()
 		self.__game.game_status_pad = game_status_pad
+		self.__game.update_status()
+
+		game_log_pad = self.__game.add_log_pad()
+		self.__game.game_log_pad = game_log_pad
 
 		curses.doupdate()
 
@@ -111,19 +115,22 @@ class TerminalHangman:
 			# Let's introduce the game
 			self.__show_game()
 
-			while True:
-				try:
-					key = self.__stdscr.getkey()
-					self.__stdscr.addstr(30, 30, key)
+			# Start the game
+			min_len_w, max_len_w = self.__game.game_settings.get_word_lenght()
+			n_round = self.__game.game_settings.get_total_round_number()
+			for current_word in self.__word_generator.get_word(n_times=n_round, min_length=min_len_w, max_length=max_len_w):
+				# Update the state
+				self.__game.game_status.next_round(word=current_word)
+				self.__game.update_status()
+				curses.doupdate()
+				
+				key = None
+				while not key:
+					try:
+						key = self.__stdscr.getkey()
+					except curses.error:
+						...
 
-					# If the user press ESC then quit
-					if key == '\x1b':
-						break
-
-				except (KeyboardInterrupt, EOFError):
-					sys.exit(0)
-				except curses.error:
-					...
 		except (KeyboardInterrupt, EOFError):
 			self.terminate()
 
