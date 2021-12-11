@@ -337,8 +337,13 @@ class Game:
         word_pad.nodelay(True)
         return word_pad
 
-    def update_word_pad(self) -> None:
-        """ Update with the new word """
+    def update_word_pad(self, reset_cursor: bool = False) -> None:
+        """
+        Update with the new word
+
+        :param reset_cursor: True if we want that the cursor go back to the start of the word
+        :return: None
+        """
         # Add the word
         self.__game_word_pad.clear()
         pos_y = self.__gwin_y + 15 - 15//2
@@ -346,4 +351,17 @@ class Game:
         for i, state in enumerate(self.__game_status.word_state):
             self.__game_word_pad.addstr(0, 3 * i, state.upper(), curses.A_BOLD | curses.A_UNDERLINE)
 
+        if reset_cursor:
+            self.__game_word_pad.move(0, 0)
+
         self.__game_word_pad.noutrefresh(0, 0, pos_y, pos_x, pos_y + 1, pos_x + self.__game_status.len_current_word * 3)
+
+    def write_guess_letter(self, current_pos: int, key: str) -> None:
+        """
+        Write a letter in the current position
+
+        :param current_pos: the current position of the cursor WRT the word
+        :param key: the pressed key
+        :return: None
+        """
+        ...

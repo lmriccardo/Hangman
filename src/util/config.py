@@ -224,3 +224,8 @@ class LogMessages:
     RIGTH_GUESS:    str = "The letter {lett} is the right one"
     WRONG_GUESS:    str = "The letter {lett} is wrong!"
     ADD_BODY_PART:  str = "Updated the hangman with {part}"
+
+
+@dataclass
+class Char:
+    NORMAL_CHAR = [chr(x) for x in range(ord("a"), ord("z") + 1)]

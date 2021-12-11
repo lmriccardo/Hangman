@@ -125,8 +125,15 @@ class TerminalHangman:
 				# Update the state
 				self.__game.game_status.next_round(word=current_word)
 				self.__game.update_status()
-				self.__game.update_word_pad()
+				self.__game.update_word_pad(reset_cursor=True)
 				curses.doupdate()
+
+				# Take the cursor position regarding the pad
+				_, pad_cursor_position_x = self.__game.game_word_pad.getyx()
+
+				# Take the cursor position with respect to the main screen
+				main_cursor_position_y, main_cursor_position_x = self.__stdscr.getyx()
+				self.__stdscr.move(main_cursor_position_y, main_cursor_position_x - pad_cursor_position_x)
 
 				key = None
 				while key != "\n":
