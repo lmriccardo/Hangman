@@ -198,7 +198,7 @@ class GameSettings:
         ("TOT ROUND NUMBER",           10),
         ("GAME DIFFICULTY",   "Very Hard"),
         ("MAX ROUND SCORE",           100),
-        ("WORD LENGHT",          (11, 20)), # -1 means maximum
+        ("WORD LENGHT",          (11, 18)), # -1 means maximum
         ("PENALTY",                     2),
         ("HINT NUMBER",          (1,   3)),
         ("HINT PENALTY",                1),  # Final score -= len(word) / (max_hint * 100)
@@ -216,3 +216,11 @@ class GameSettings:
                 "Very Hard": cls.VERY_HARD_SETUP
             }.get(difficulty)
         )
+
+@dataclass
+class LogMessages:
+    BOX_SELECTION:  str = "The {number} box has been selected"
+    CHAR_INSERTION: str = "You have tried the letter {lett}"
+    RIGTH_GUESS:    str = "The letter {lett} is the right one"
+    WRONG_GUESS:    str = "The letter {lett} is wrong!"
+    ADD_BODY_PART:  str = "Updated the hangman with {part}"

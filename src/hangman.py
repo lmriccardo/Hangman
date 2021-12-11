@@ -96,6 +96,9 @@ class TerminalHangman:
 		game_log_pad = self.__game.add_log_pad()
 		self.__game.game_log_pad = game_log_pad
 
+		game_word_pad = self.__game.add_word_pad()
+		self.__game.game_word_pad = game_word_pad
+
 		curses.doupdate()
 
 	def _start_game(self) -> None:
@@ -122,10 +125,11 @@ class TerminalHangman:
 				# Update the state
 				self.__game.game_status.next_round(word=current_word)
 				self.__game.update_status()
+				self.__game.update_word_pad()
 				curses.doupdate()
-				
+
 				key = None
-				while not key:
+				while key != "\n":
 					try:
 						key = self.__stdscr.getkey()
 					except curses.error:

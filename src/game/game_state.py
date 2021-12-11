@@ -215,7 +215,7 @@ class GameStatus:
         self.__penalty = 0
 
         # We set some letters of the word_state to clear depending on the difficulty
-        self.__word_state = ["_"] * self.__len_current_word
+        self.__word_state = [" "] * self.__len_current_word
         if self.__game_settings.get_game_difficulty() in ["Hard", "Very Hard"]:
             self.__word_state[0] = self.__word[0]
             self.__word_state[len(self.__word)//2] = self.__word[len(self.__word) // 2]

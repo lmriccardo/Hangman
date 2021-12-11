@@ -24,6 +24,7 @@ class Game:
         self.__description_diff_game_pad = None
         self.__game_status_pad = None
         self.__game_log_pad = None
+        self.__game_word_pad = None
 
     @property
     def window(self):
@@ -94,6 +95,16 @@ class Game:
     def game_log_pad(self, new_value) -> None:
         """ Set a new value for the attribute game_log_pad """
         self.__game_log_pad = new_value
+
+    @property
+    def game_word_pad(self):
+        """ Return the pad in which insert the word """
+        return self.__game_word_pad
+
+    @game_word_pad.setter
+    def game_word_pad(self, new_value) -> None:
+        """ Set a new value for the attribute game_word_pad """
+        self.__game_word_pad = new_value
 
     def initialize_window(self) -> curses.window:
         """ Initialize the game creating the game window """
@@ -318,3 +329,21 @@ class Game:
         self.__window.noutrefresh()
 
         return log_pad
+
+    @staticmethod
+    def add_word_pad() -> curses.window:
+        """ Add the pad for the word to guess """
+        word_pad = curses.newpad(100, 100)
+        word_pad.nodelay(True)
+        return word_pad
+
+    def update_word_pad(self) -> None:
+        """ Update with the new word """
+        # Add the word
+        self.__game_word_pad.clear()
+        pos_y = self.__gwin_y + 15 - 15//2
+        pos_x = self.__gwin_x + 35
+        for i, state in enumerate(self.__game_status.word_state):
+            self.__game_word_pad.addstr(0, 3 * i, state.upper(), curses.A_BOLD | curses.A_UNDERLINE)
+
+        self.__game_word_pad.noutrefresh(0, 0, pos_y, pos_x, pos_y + 1, pos_x + self.__game_status.len_current_word * 3)
