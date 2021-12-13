@@ -14,6 +14,7 @@ class Conductor:
             "START GAME"         : (list(Messages.START_GAME), Colors.return_pair_for_index(Colors.START_GAME[1])),
             "START ROUND"        : (list(Messages.START_ROUND), Colors.return_pair_for_index(Colors.START_ROUND[1])),
             "ON ERROR"           : (list(Messages.ON_ERROR), Colors.return_pair_for_index(Colors.ON_ERROR[1])),
+            "NO HINT"            : (list(Messages.NO_HINT),  Colors.return_pair_for_index(Colors.NO_HINT[1])),
             "END POSITIVE ROUND" : (list(Messages.END_POSITIVE_ROUND), Colors.return_pair_for_index(Colors.END_POSITIVE_ROUND[1])),
             "END NEGATIVE ROUND" : (list(Messages.END_NEGATIVE_ROUND), Colors.return_pair_for_index(Colors.END_NEGATIVE_ROUND[1])),
             "END GAME"           : (list(Messages.END_GAME), Colors.return_pair_for_index(Colors.END_GAME[1]))
@@ -76,8 +77,8 @@ class Conductor:
 
     def print(self, section: str) -> None:
         """ Print the messages of the corresponding section """
-        music_thread = multiprocessing.Process(target=playbck.play, args=(self.__type_writer_sound,))
-        music_thread.start()
+        # music_thread = multiprocessing.Process(target=playbck.play, args=(self.__type_writer_sound,))
+        # music_thread.start()
         lines, color = self.__msg_dict[section]
         y_postion = 2 + len(AsciiArt.TITLE.split("\n")) + 1
         max_len = 0
@@ -104,4 +105,4 @@ class Conductor:
         self.__messages_current_max_len = max_len
         self.__messages_current_max_h = max_heigth
 
-        music_thread.terminate()
+        # music_thread.terminate()

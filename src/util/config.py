@@ -34,11 +34,15 @@ class Messages:
     )
 
     ON_ERROR          : Tuple[str] = (
-        "Oh No! You miss that"
+        "Oh No! You miss that",
+    )
+
+    NO_HINT           : Tuple[str] = (
+        "You have no more hints!",
     )
 
     END_POSITIVE_ROUND: Tuple[str] = (
-        "Well done! Let start another round"
+        "Well done! Let start another round",
     )
 
     END_NEGATIVE_ROUND: Tuple[str] = (
@@ -106,6 +110,7 @@ class Colors:
     START_GAME        : Tuple[int, int] = (curses.COLOR_GREEN,  2)
     START_ROUND       : Tuple[int, int] = (curses.COLOR_YELLOW, 1)
     ON_ERROR          : Tuple[int, int] = (curses.COLOR_RED,    3)
+    NO_HINT           : Tuple[int, int] = (curses.COLOR_RED,    3)
     END_POSITIVE_ROUND: Tuple[int, int] = (curses.COLOR_BLUE,   4)
     END_NEGATIVE_ROUND: Tuple[int, int] = (curses.COLOR_RED,    3)
     END_GAME          : Tuple[int, int] = (curses.COLOR_GREEN,  2)
@@ -219,13 +224,15 @@ class GameSettings:
 
 @dataclass
 class LogMessages:
-    BOX_SELECTION:  str = "The {number} box has been selected"
-    CHAR_INSERTION: str = "You have tried the letter {lett}"
-    RIGTH_GUESS:    str = "The letter {lett} is the right one"
-    WRONG_GUESS:    str = "The letter {lett} is wrong!"
-    ADD_BODY_PART:  str = "Updated the hangman with {part}"
+    BOX_SELECTION:  str = "You move the cursor to position %s"
+    CHAR_INSERTION: str = "You have tried the letter %s"
+    RIGTH_GUESS:    str = "The letter %s is the right one"
+    WRONG_GUESS:    str = "The letter %s is wrong!"
+    ADD_BODY_PART:  str = "Updated the hangman with %s"
+    HINT_USED:      str = "Using the hint number %s"
 
 
 @dataclass
 class Char:
     NORMAL_CHAR = [chr(x) for x in range(ord("a"), ord("z") + 1)]
+    NUMBERS     = [str(x) for x in range(0, 10)]

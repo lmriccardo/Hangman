@@ -105,7 +105,7 @@ class TerminalHangman:
 		""" Start the game """
 		try:
 			# Start the music
-			self.__bckgrd_music_thread.start()
+			# self.__bckgrd_music_thread.start()
 
 			self.__stdscr.clear()
 
@@ -128,17 +128,45 @@ class TerminalHangman:
 				self.__game.update_word_pad(reset_cursor=True)
 				curses.doupdate()
 
-				# Take the cursor position regarding the pad
-				_, pad_cursor_position_x = self.__game.game_word_pad.getyx()
-
-				# Take the cursor position with respect to the main screen
-				main_cursor_position_y, main_cursor_position_x = self.__stdscr.getyx()
-				self.__stdscr.move(main_cursor_position_y, main_cursor_position_x - pad_cursor_position_x)
+				current_position = 0
+				tmp_position = current_position
 
 				key = None
 				while key != "\n":
 					try:
 						key = self.__stdscr.getkey()
+						# If it is a normal char then write it (temp)
+						if key in Char.NORMAL_CHAR and self.__game.game_status.word_state[current_position] == " ":
+							self.__game.write_log(message=LogMessages.CHAR_INSERTION, insert=key)
+							if self.__game.game_status.word[current_position] == key:
+								self.__game.write_guess_letter(current_pos=current_position, key=key)
+								self.__game.write_log(message=LogMessages.RIGTH_GUESS, insert=key)
+							else:
+								self.__conductor.print(section="ON ERROR")
+								self.__game.write_log(message=LogMessages.WRONG_GUESS, insert=key)
+
+						# Otherwise could be an arrows
+						if key == "KEY_LEFT" and current_position > 0:
+							tmp_position -= 1
+						elif key == "KEY_RIGHT" and current_position < len(current_word) - 1:
+							tmp_position += 1
+
+						if tmp_position != current_position:
+							current_position = tmp_position
+							self.__game.write_log(message=LogMessages.BOX_SELECTION, insert=str(current_position))
+							self.__game.move_cursor(current_position)
+
+						# Else use hint
+						if key == "1":
+							if self.__game.game_status.number_of_used_hints < self.__game.game_settings.map_wordlen_maxhints(wordlen=len(current_word)):
+								self.__game.game_status.number_of_used_hints += 1
+								self.__game.write_guess_letter(current_pos=current_position, key=self.__game.game_status.word[current_position])
+								self.__game.write_log(message=LogMessages.HINT_USED, insert=str(self.__game.game_status.number_of_used_hints))
+								self.__game.update_status()
+							else:
+								self.__conductor.print(section="NO HINT")
+
+						curses.doupdate()
 					except curses.error:
 						...
 
@@ -154,7 +182,7 @@ class TerminalHangman:
 		""" Terminate all the secondary processes and return to the main window """
 		# Kill processes
 		for process in self.__processes:
-			process.terminate()
+			... # process.terminate()
 
 		# Return to the main screen settings
 		curses.endwin()

@@ -1,3 +1,4 @@
+from typing import List
 from src.conductor.conductor import Conductor
 from src.game.game_state import GameStatus, GameSetting
 from src.util.config import *
@@ -25,6 +26,8 @@ class Game:
         self.__game_status_pad = None
         self.__game_log_pad = None
         self.__game_word_pad = None
+
+        self.__log_messages: List[str] = []
 
     @property
     def window(self):
@@ -227,7 +230,7 @@ class Game:
     def update_window_title(self) -> None:
         """ simply update the title of the window with the right difficulty """
         self.__window.addstr(
-            0, 3, f"Hangman Game - {self.__game_settings.get_game_difficulty()} Mode",
+            0, 3, f"Hangman Game - {self.__game_settings.get_game_difficulty()} Mode - <1 Use Hint> - <CTRL-c To quit the game>",
             Colors.return_pair_for_index(Colors.TITLE[1]) | curses.A_UNDERLINE
         )
         self.__window.noutrefresh()
@@ -330,6 +333,22 @@ class Game:
 
         return log_pad
 
+    def write_log(self, message: str, insert: str) -> None:
+        """
+        Write a log in the log pad
+
+        :param message: the message (see src.util.config.LogMessages)
+        :param insert: The string that complete the message (by formatting)
+        :return: None
+        """
+        log_message = message % insert
+        self.__log_messages.append(log_message)
+
+        starting_point = len(self.__log_messages) - 6 if len(self.__log_messages) > 6 else 0
+        self.__game_log_pad.addstr(len(self.__log_messages) - 1, 0, log_message, curses.A_BOLD)
+
+        self.__game_log_pad.refresh(starting_point, 0, self.__gwin_y + 21, 7, self.__gwin_y + 26, self.__gwin_w // 2 + 20)
+
     @staticmethod
     def add_word_pad() -> curses.window:
         """ Add the pad for the word to guess """
@@ -337,11 +356,13 @@ class Game:
         word_pad.nodelay(True)
         return word_pad
 
-    def update_word_pad(self, reset_cursor: bool = False) -> None:
+    def update_word_pad(self, reset_cursor: bool = False, default_lett: Dict[int, str] = None, cursor_position: int = None) -> None:
         """
         Update with the new word
 
         :param reset_cursor: True if we want that the cursor go back to the start of the word
+        :param default_lett: A dictionary containing default value for some position of the word. Can be used to indicate an update
+        :param cursor_position: An integer representing the position of the cursor in the word
         :return: None
         """
         # Add the word
@@ -349,12 +370,27 @@ class Game:
         pos_y = self.__gwin_y + 15 - 15//2
         pos_x = self.__gwin_x + 35
         for i, state in enumerate(self.__game_status.word_state):
-            self.__game_word_pad.addstr(0, 3 * i, state.upper(), curses.A_BOLD | curses.A_UNDERLINE)
+            current_state = state
+            if default_lett is not None and i in default_lett:
+                current_state = default_lett[i]
+
+            self.__game_word_pad.addstr(0, 3 * i, current_state.upper(), curses.A_BOLD | curses.A_UNDERLINE)
+
+        if cursor_position is not None:
+            self.__game_word_pad.move(0, cursor_position)
 
         if reset_cursor:
             self.__game_word_pad.move(0, 0)
 
         self.__game_word_pad.noutrefresh(0, 0, pos_y, pos_x, pos_y + 1, pos_x + self.__game_status.len_current_word * 3)
+
+    def clear_word_pad(self) -> None:
+        """ Clear the pad of the word """
+        pos_x = self.__gwin_x + 35
+        pos_y = self.__gwin_y + 15 - 15 // 2
+        current_word_len = self.__game_status.len_current_word
+        self.__game_word_pad.clear()
+        self.__game_word_pad.noutrefresh(0, 0, pos_y, pos_x, pos_y + 1, pos_x + current_word_len * 3)
 
     def write_guess_letter(self, current_pos: int, key: str) -> None:
         """
@@ -364,4 +400,17 @@ class Game:
         :param key: the pressed key
         :return: None
         """
-        ...
+        # First clear the pad
+        self.clear_word_pad()
+
+        # Then update the state and rewrite
+        self.__game_status.update_word_state(current_pos, key)
+        current_state_dict: Dict[int, str] = {idx : x for idx, x in enumerate(self.__game_status.word_state) if x != " "}
+        self.update_word_pad(default_lett=current_state_dict, cursor_position=current_pos * 3)
+
+    def move_cursor(self, position: int) -> None:
+        """ Move the cursor in the window word pad """
+        pos_x = self.__gwin_x + 35
+        pos_y = self.__gwin_y + 15 - 15 // 2
+        self.__game_word_pad.move(0, position * 3)
+        self.__game_word_pad.noutrefresh(0, 0, pos_y, pos_x, pos_y + 1, pos_x + self.__game_status.len_current_word * 3)
