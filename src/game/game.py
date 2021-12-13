@@ -261,6 +261,57 @@ class Game:
 
         return hangman_pad
 
+    def update_hangman(self, body_dict: Dict[str, str]) -> None:
+        """
+        Update the hangman inserting the part of the body specified in the input paramter kargs.
+        So we have a dictionary of parameter that will be by default
+        {
+            "head" : "",
+            "larm" : "",
+            "body" : "",
+            "rarm" : "",
+            "lleg" : "",
+            "rleg" : "",
+            "lfoot": "",
+            "rfoot": ""
+        }
+        """
+        self.__hangman_pad.clear()
+        self.__hangman_pad.addstr(AsciiArt.HANGMAN.format(
+            head=body_dict["head"], larm=body_dict["larm"], body=body_dict["body"],
+            rarm=body_dict["rarm"], lleg=body_dict["lleg"], rleg=body_dict["rleg"],
+            lfoot=body_dict["lfoot"], rfoot=body_dict["rfoot"]
+        ), curses.A_BOLD)
+        self.__hangman_pad.noutrefresh(0, 0, self.__gwin_y + 4, self.__gwin_x + 5, self.__gwin_y + 15, self.__gwin_x + 23)
+
+    @staticmethod
+    def update_body_dict(body_dict: Dict[str, str], current_wrong_try: int, is_veryhard: bool) -> None:
+        """ Update the body dict """
+        if current_wrong_try == 1:
+            body_dict["head"] = AsciiArt.HANGMAN_HEAD
+            if is_veryhard:
+                body_dict["body"] = AsciiArt.HANGMAN_BODY
+        elif current_wrong_try == 2 and not is_veryhard:
+            body_dict["body"] = AsciiArt.HANGMAN_BODY
+        elif current_wrong_try == 3:
+            body_dict["rarm"] = AsciiArt.HANGMAN_RIGHT_ARM
+            if is_veryhard:
+                body_dict["larm"] = AsciiArt.HANGMAN_LEFT_ARM
+        elif current_wrong_try == 4 and not is_veryhard:
+            body_dict["larm"] = AsciiArt.HANGMAN_LEFT_ARM
+        elif current_wrong_try == 5:
+            body_dict["rleg"] = AsciiArt.HANGMAN_RIGHT_LEG
+            if is_veryhard:
+                body_dict["lleg"] = AsciiArt.HANGMAN_LEFT_LEG
+        elif current_wrong_try == 6 and not is_veryhard:
+            body_dict["lleg"] = AsciiArt.HANGMAN_LEFT_LEG
+        elif current_wrong_try == 7:
+            body_dict["rfoot"] = AsciiArt.HANGMAN_FOOT
+            if is_veryhard:
+                body_dict["lfoot"] = AsciiArt.HANGMAN_FOOT
+        elif current_wrong_try == 8 and not is_veryhard:
+            body_dict["lfoot"] = AsciiArt.HANGMAN_FOOT
+
     def add_game_setting_pad(self) -> curses.window:
         """ Add the pad for displaying the game settings """
         settings_pad = curses.newpad(100, 100)

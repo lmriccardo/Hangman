@@ -84,9 +84,8 @@ class GameSetting:
         hints_sett = self.__settings[GameSettings.HINT_NUMBER]
         hints_range = list(range(hints_sett[0], hints_sett[1] + 1))
 
-        word_len_index = wordlen_ranges.index(wordlen)
-
         try:
+            word_len_index = wordlen_ranges.index(wordlen)
             return hints_range[word_len_index]
         except ValueError:
             return hints_range[-1]

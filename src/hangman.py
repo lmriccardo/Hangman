@@ -126,13 +126,21 @@ class TerminalHangman:
 				self.__game.game_status.next_round(word=current_word)
 				self.__game.update_status()
 				self.__game.update_word_pad(reset_cursor=True)
+				self.__conductor.print(section="START ROUND")
 				curses.doupdate()
 
 				current_position = 0
 				tmp_position = current_position
 
-				key = None
-				while key != "\n":
+				body_dict: Dict[str, str] = {
+					"head": " ", "larm": " ", "body": " ",
+					"rarm": " ", "lleg": " ", "rleg": " ",
+					"lfoot": " ", "rfoot": " "
+				}
+				is_veryhard = self.__game.game_settings.get_game_difficulty() == "Very Hard"
+
+				while self.__game.game_status.word_state.count(" ") > 0 and \
+						self.__game.game_status.number_of_wrong_letters < (is_veryhard * 7 + (1 - is_veryhard) * 8):
 					try:
 						key = self.__stdscr.getkey()
 						# If it is a normal char then write it (temp)
@@ -141,11 +149,18 @@ class TerminalHangman:
 							if self.__game.game_status.word[current_position] == key:
 								self.__game.write_guess_letter(current_pos=current_position, key=key)
 								self.__game.write_log(message=LogMessages.RIGTH_GUESS, insert=key)
+								self.__game.game_status.number_of_guessed_letters += 1
 							else:
 								self.__conductor.print(section="ON ERROR")
 								self.__game.write_log(message=LogMessages.WRONG_GUESS, insert=key)
+								self.__game.game_status.number_of_wrong_letters += 1
 
-						# Otherwise could be an arrows
+								if is_veryhard and self.__game.game_status.number_of_wrong_letters > 1:
+									self.__game.game_status.number_of_wrong_letters += 1
+								Game.update_body_dict(body_dict=body_dict, current_wrong_try=self.__game.game_status.number_of_wrong_letters, is_veryhard=is_veryhard)
+								self.__game.update_hangman(body_dict=body_dict)
+
+						# Otherwise, could be an arrows
 						if key == "KEY_LEFT" and current_position > 0:
 							tmp_position -= 1
 						elif key == "KEY_RIGHT" and current_position < len(current_word) - 1:
@@ -162,10 +177,11 @@ class TerminalHangman:
 								self.__game.game_status.number_of_used_hints += 1
 								self.__game.write_guess_letter(current_pos=current_position, key=self.__game.game_status.word[current_position])
 								self.__game.write_log(message=LogMessages.HINT_USED, insert=str(self.__game.game_status.number_of_used_hints))
-								self.__game.update_status()
 							else:
 								self.__conductor.print(section="NO HINT")
 
+						self.__game.update_status()
+						self.__game.move_cursor(current_position)
 						curses.doupdate()
 					except curses.error:
 						...

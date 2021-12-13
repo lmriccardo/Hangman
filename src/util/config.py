@@ -29,7 +29,7 @@ class Messages:
     )
 
     START_ROUND       : Tuple[str] = (
-        "The game has started",
+        "A new round has started",
         "Go! Remember, you have limited time"
     )
 
