@@ -104,4 +104,4 @@ The second method to download the game is through git. Just do the following ste
 ## The output
 After executing the game the conductor will introduce you to the Hangman game. When it finished to talk, the game will ask you with which difficulty you wanna play.
 
-![](https://imgur.com/a/6L2wT6A)
+![](https://i.imgur.com/s7zZNQh.png)
