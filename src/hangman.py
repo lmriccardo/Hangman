@@ -242,7 +242,7 @@ class TerminalHangman:
 				for idx, lett in enumerate(current_word):
 					self.__game.write_guess_letter(current_pos=idx, key=lett)
 					curses.doupdate()
-					
+
 				time.sleep(5)
 
 		except (KeyboardInterrupt, EOFError):
