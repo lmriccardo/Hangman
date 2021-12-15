@@ -473,3 +473,4 @@ class Game:
         pos_y = self.__gwin_y + 15 - 15 // 2
         self.__game_word_pad.move(0, position * 3)
         self.__game_word_pad.noutrefresh(0, 0, pos_y, pos_x, pos_y + 1, pos_x + self.__game_status.len_current_word * 3)
+        
