@@ -99,3 +99,9 @@ The second method to download the game is through git. Just do the following ste
 3. <code>Create the virtual env and activate</code>
 4. <code>pip install -r requirements.txt</code>
 5. <code>python -m src.hangman</code>
+
+
+## The output
+After executing the game the conductor will introduce you to the Hangman game. When it finished to talk, the game will ask you with which difficulty you wanna play.
+
+![](https://imgur.com/a/6L2wT6A)
