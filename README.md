@@ -105,3 +105,7 @@ The second method to download the game is through git. Just do the following ste
 After executing the game the conductor will introduce you to the Hangman game. When it finished to talk, the game will ask you with which difficulty you wanna play.
 
 ![](https://i.imgur.com/s7zZNQh.png)
+
+the user can choose the difficulty simply moving with the arrows and then press ENTER. Once the user has chosen the difficulty, the game can start. Instead of displaying the difficulty question, inside the Hangman Game windows there are 4 sections. The first one (or the upper left) contains the hangman and the word the user has to guess. The botton left section is a logging window in which every action of the user is logged. The upper right mini-window display the game settings. Finally, the bottom right section display the game status. In addition, the title of the game window has changed displaying not only the original title but also the difficulty, some actions (1 to use hint and CTRL + c to quit the game) and finally the timer (on the right side). 
+
+![](https://imgur.com/cYASZsQ.png)
