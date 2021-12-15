@@ -72,3 +72,30 @@ Some external requirements:
 
 ### Install curses on Windows
 Sadly, curses is not a module of the standard library of Python in Windows. In order to install it, you need to install NCurses and you can do it from [here](https://invisible-island.net/ncurses/). Otherwise, you can try to install from MinGW: look at [this](https://e-l.unifi.it/pluginfile.php/805205/mod_resource/content/0/ncurses%20installation%20-%20en.pdf). However, It really suggested to used a Unix-based OS.
+
+### Install ffmpeg
+In MacOS, it is really simple, just open a terminal and use <code>sudo brew install ffmpeg</code>. Otherwise, if you are in Linux first update the repo <code>sudo apt-get update</code> and then install the package <code>sudo apt-get install -y ffmpeg</code>. In windows, please search over the internet (I'm sorry bro).
+
+
+## Run the game
+There are two ways to download this game. The first one is through pip module. Essentially, after done <code>pip install hangman</code>, **PLEASE MAKE SURE YOU ARE IN A FULL SCREEN TERMINAL** you can run it with <code>python[ver] hangman</code>, where [ver] is the current version of python you are using to run the game. Another suggestion, if I can, is to create a python virtual environment, before running the game. It is very simple:
+
+1. <code>python[ver] -m venv venv_name</code>
+2. <code>source venv_name/bin/activate</code>
+3. <code>pip install hangman</code>
+4. <code>python hangman</code>
+
+In Windows the second point change and become <code>.\venv_name\Scripts\activate</code>. Be careful, this may don't work and return the error *cannot be loaded because the execution of scripts is disabled on this system*. In this situation there are two ways to solve the problem (both changing policy restriction). Open your windows PowersShell in the current folder where you want to execute the game and write one of the two commands:
+
+1. <code>Set-ExecutionPolicy Unrestricted -Scope Process</code>
+2. <code>Set-ExecutionPolicy Unrestricted -Force</code>
+
+the main difference is that the first one is regard the current process (so, the current PowerShell), while the second one is for the entire system.
+
+The second method to download the game is through git. Just do the following steps:
+
+1. <code>git clone -b cli_hangman https://github.com/lmriccardo/Hangman.git </code>
+2. <code>cd Hangman</code>
+3. <code>Create the virtual env and activate</code>
+4. <code>pip install -r requirements.txt</code>
+5. <code>python -m src.hangman</code>
