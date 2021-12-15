@@ -40,3 +40,16 @@ Finally, other additions are:
 + the countdown timer for each round;
 + the hints (they are not in the original game);
 + higher the difficulty, more letter are already shown (in the original only the first);
+
+> Note (HINT): using an hint means showing the letter where the user has currently the cursor
+
+## Game Mode
+As we have already said, there are four game mode: E, M, H and VH. Let's explore them.
+
+|           | N. Round | Time x Round | Min Word Len | Max Word Len | Penalty | Min Hint N. | Max Hint N. | Hint Penalty |
+|-----------|----------|--------------|--------------|--------------|---------|-------------|-------------|--------------|
+| Easy      |    10    |    60 sec    |       5      |       7      |    1    |      3      |      5      |       0      |
+| Medium    |    10    |    300 sec   |       7      |       9      |    1    |      2      |      4      |       0      |
+| Hard      |    10    |    600 sec   |       9      |      11      |    1    |      1      |      3      |       0      |
+| Very Hard |    10    |   1200 sec   |      11      |      18      |    2    |      1      |      3      |       1      |
+
