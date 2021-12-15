@@ -55,6 +55,11 @@ As we have already said, there are four game mode: E, M, H and VH. Let's explore
 
 > Note (HINT PENALTY): except for the first three modes, the VH-mode has the column _Hint Penalty_ set to 1. What does It mean? It means that at the end of the round the total score would be 0 if the user has lost, otherwise is the 100 - (word_len / (max_hint * 100)) * number_used_hints * hint_penalty. So, if *Hint penalty* is 0 then the score will remain the same (either 100 or 0). 
 
+There is also another difference between the difficulty:
++ E Mode: only the first letter is shown at the start
++ M Mode: both the first and the last one letters are yet shown
++ H and VH Mode: first, middle and last letters are yet shown
+
 
 ## Requirements
 We have some requirements:
@@ -109,3 +114,5 @@ After executing the game the conductor will introduce you to the Hangman game. W
 the user can choose the difficulty simply moving with the arrows and then press ENTER. Once the user has chosen the difficulty, the game can start. Instead of displaying the difficulty question, inside the Hangman Game windows there are 4 sections. The first one (or the upper left) contains the hangman and the word the user has to guess. The botton left section is a logging window in which every action of the user is logged. The upper right mini-window display the game settings. Finally, the bottom right section display the game status. In addition, the title of the game window has changed displaying not only the original title but also the difficulty, some actions (1 to use hint and CTRL + c to quit the game) and finally the timer (on the right side). 
 
 ![](https://imgur.com/cYASZsQ.png)
+
+The user can insert the letter that wants to try using the corresponding key on the keyboard. At the end of each round the user can wait 5 seconds before the next round start.
