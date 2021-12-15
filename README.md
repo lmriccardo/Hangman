@@ -43,7 +43,7 @@ Finally, other additions are:
 
 > Note (HINT): using an hint means showing the letter where the user has currently the cursor
 
-## Game Mode
+## Game Modes
 As we have already said, there are four game mode: E, M, H and VH. Let's explore them.
 
 |           | N. Round | Time x Round | Min Word Len | Max Word Len | Penalty | Min Hint N. | Max Hint N. | Hint Penalty |
@@ -53,3 +53,22 @@ As we have already said, there are four game mode: E, M, H and VH. Let's explore
 | Hard      |    10    |    600 sec   |       9      |      11      |    1    |      1      |      3      |       0      |
 | Very Hard |    10    |   1200 sec   |      11      |      18      |    2    |      1      |      3      |       1      |
 
+> Note (HINT PENALTY): except for the first three modes, the VH-mode has the column _Hint Penalty_ set to 1. What does It mean? It means that at the end of the round the total score would be 0 if the user has lost, otherwise is the 100 - (word_len / (max_hint * 100)) * number_used_hints * hint_penalty. So, if *Hint penalty* is 0 then the score will remain the same (either 100 or 0). 
+
+
+## Requirements
+We have some requirements:
++ art==5.3 (for ASCII ART)
++ pydub==0.25.1 (in order to play the music)
++ simpleaudio==1.0.4 (support for pydub)
++ curses (already installed in Unix/MacOS)
+
+All of them are installable via pip using <code>pip install name==ver</code>, or directly using the requirements.txt file <code>pip install -r requirements.txt</code>. If you are using Linux and pip is not available then use <code>python3 -m pip install ...</code>, otherwise first install pip using <code>sudo apt-get install -y python3-pip</code> and then use the previous method. 
+
+Some external requirements:
++ Linux/MaxOS (suggested, no need to install curses and colors may don't work);
++ install ffmpeg (to play the bkg music)
++ use Python 3.9 or above (**MANDATORY**)
+
+### Install curses on Windows
+Sadly, curses is not a module of the standard library of Python in Windows. In order to install it, you need to install NCurses and you can do it from [here](https://invisible-island.net/ncurses/). Otherwise, you can try to install from MinGW: look at [this](https://e-l.unifi.it/pluginfile.php/805205/mod_resource/content/0/ncurses%20installation%20-%20en.pdf). However, It really suggested to used a Unix-based OS.
