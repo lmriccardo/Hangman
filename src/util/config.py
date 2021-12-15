@@ -43,11 +43,13 @@ class Messages:
 
     END_POSITIVE_ROUND: Tuple[str] = (
         "Well done! Let start another round",
+        "You have 5 seconds breath"
     )
 
     END_NEGATIVE_ROUND: Tuple[str] = (
         "Don't give up!",
-        "You will do better in the next round"
+        "You will do better in the next round",
+        "You have 5 seconds breath"
     )
 
     END_GAME          : Tuple[str] = (

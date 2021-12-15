@@ -105,7 +105,7 @@ class TerminalHangman:
 		""" Start the game """
 		try:
 			# Start the music
-			# self.__bckgrd_music_thread.start()
+			self.__bckgrd_music_thread.start()
 
 			self.__stdscr.clear()
 
@@ -138,9 +138,11 @@ class TerminalHangman:
 					"lfoot": " ", "rfoot": " "
 				}
 				is_veryhard = self.__game.game_settings.get_game_difficulty() == "Very Hard"
-
+				init_seconds = self.__game.game_settings.get_max_time_per_round()
+				current_time = time.time()
 				while self.__game.game_status.word_state.count(" ") > 0 and \
-						self.__game.game_status.number_of_wrong_letters < (is_veryhard * 7 + (1 - is_veryhard) * 8):
+						self.__game.game_status.number_of_wrong_letters < (is_veryhard * 7 + (1 - is_veryhard) * 8) and \
+						init_seconds > 0:
 					try:
 						key = self.__stdscr.getkey()
 						# If it is a normal char then write it (temp)
@@ -157,7 +159,13 @@ class TerminalHangman:
 
 								if is_veryhard and self.__game.game_status.number_of_wrong_letters > 1:
 									self.__game.game_status.number_of_wrong_letters += 1
-								Game.update_body_dict(body_dict=body_dict, current_wrong_try=self.__game.game_status.number_of_wrong_letters, is_veryhard=is_veryhard)
+
+								Game.update_body_dict(
+									body_dict=body_dict,
+									current_wrong_try=self.__game.game_status.number_of_wrong_letters,
+									is_veryhard=is_veryhard
+								)
+
 								self.__game.update_hangman(body_dict=body_dict)
 
 						# Otherwise, could be an arrows
@@ -175,16 +183,43 @@ class TerminalHangman:
 						if key == "1":
 							if self.__game.game_status.number_of_used_hints < self.__game.game_settings.map_wordlen_maxhints(wordlen=len(current_word)):
 								self.__game.game_status.number_of_used_hints += 1
-								self.__game.write_guess_letter(current_pos=current_position, key=self.__game.game_status.word[current_position])
-								self.__game.write_log(message=LogMessages.HINT_USED, insert=str(self.__game.game_status.number_of_used_hints))
+								self.__game.write_guess_letter(
+									current_pos=current_position,
+									key=self.__game.game_status.word[current_position]
+								)
+								self.__game.write_log(
+									message=LogMessages.HINT_USED,
+									insert=str(self.__game.game_status.number_of_used_hints)
+								)
 							else:
 								self.__conductor.print(section="NO HINT")
 
 						self.__game.update_status()
 						self.__game.move_cursor(current_position)
-						curses.doupdate()
 					except curses.error:
-						...
+
+						if abs(current_time - (t := time.time())) > 1:
+							current_time = t
+							init_seconds -= 1
+
+							hour = init_seconds // 3600
+							hour_str = f"{hour}" if hour > 9 else f"0{hour}"
+
+							minute = (init_seconds % 3600) // 60
+							minute_str = f"{minute}" if minute > 9 else f"0{minute}"
+
+							second = init_seconds % 60
+							second_str = f"{second}" if second > 9 else f"0{second}"
+
+							time_str = f"{hour_str}H:{minute_str}M:{second_str}S"
+							self.__game.update_time(time_str, cursor_position=current_position)
+
+					finally:
+						curses.doupdate()
+
+				section = "END POSITIVE ROUND" if self.__game.game_status.word_state.count(" ") == 0 else "END NEGATIVE ROUND"
+				self.__conductor.print(section=section)
+				time.sleep(5)
 
 		except (KeyboardInterrupt, EOFError):
 			self.terminate()
@@ -198,7 +233,7 @@ class TerminalHangman:
 		""" Terminate all the secondary processes and return to the main window """
 		# Kill processes
 		for process in self.__processes:
-			... # process.terminate()
+			process.terminate()
 
 		# Return to the main screen settings
 		curses.endwin()

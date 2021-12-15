@@ -1,9 +1,11 @@
+import threading
 from typing import List
 from src.conductor.conductor import Conductor
 from src.game.game_state import GameStatus, GameSetting
 from src.util.config import *
 import curses
 from curses.textpad import rectangle
+import time
 
 
 class Game:
@@ -234,6 +236,12 @@ class Game:
             Colors.return_pair_for_index(Colors.TITLE[1]) | curses.A_UNDERLINE
         )
         self.__window.noutrefresh()
+
+    def update_time(self, time_str: str, cursor_position: int) -> None:
+        """ Update the timer in the window for the game """
+        self.__window.addstr(0, self.__gwin_w - 20, time_str, Colors.return_pair_for_index(Colors.TITLE[1]) | curses.A_UNDERLINE)
+        self.__window.noutrefresh()
+        self.move_cursor(position=cursor_position)
 
     def clear_select_diff(self) -> None:
         """ Clear and delete the pads used for the diffculty selection """

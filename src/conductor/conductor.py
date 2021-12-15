@@ -77,8 +77,8 @@ class Conductor:
 
     def print(self, section: str) -> None:
         """ Print the messages of the corresponding section """
-        # music_thread = multiprocessing.Process(target=playbck.play, args=(self.__type_writer_sound,))
-        # music_thread.start()
+        music_thread = multiprocessing.Process(target=playbck.play, args=(self.__type_writer_sound,))
+        music_thread.start()
         lines, color = self.__msg_dict[section]
         y_postion = 2 + len(AsciiArt.TITLE.split("\n")) + 1
         max_len = 0
@@ -105,4 +105,4 @@ class Conductor:
         self.__messages_current_max_len = max_len
         self.__messages_current_max_h = max_heigth
 
-        # music_thread.terminate()
+        music_thread.terminate()

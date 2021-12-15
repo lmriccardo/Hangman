@@ -216,6 +216,7 @@ class GameStatus:
         self.__round += 1
         self.__number_of_used_hints = 0
         self.__number_of_wrong_letters = 0
+        self.__number_of_guessed_letters = 0
         self.__penalty = 0
 
         # We set some letters of the word_state to clear depending on the difficulty
