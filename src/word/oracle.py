@@ -1,4 +1,4 @@
-from typing import List, Union, Generator
+from typing import List, Generator
 from src.util.config import System
 import random
 
@@ -23,7 +23,7 @@ class WordOracle:
         """
         return list(
             filter(
-                lambda x: (min_length <= len(x) <= max_length),
+                lambda x: (min_length <= len(x[:-1]) <= max_length) and "'" not in x,
                 self.__words
             )
         )

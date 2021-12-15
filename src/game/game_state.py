@@ -87,7 +87,7 @@ class GameSetting:
         try:
             word_len_index = wordlen_ranges.index(wordlen)
             return hints_range[word_len_index]
-        except ValueError:
+        except (ValueError, IndexError):
             return hints_range[-1]
 
 

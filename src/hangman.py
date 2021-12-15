@@ -217,8 +217,32 @@ class TerminalHangman:
 					finally:
 						curses.doupdate()
 
+				# the user wins
+				score = 0
+				if self.__game.game_status.word_state.count(" ") == 0:
+					score = 100
+
+				if self.__game.game_settings.get_game_difficulty() == "Very Hard":
+					word_len = self.__game.game_status.len_current_word
+					used_hints = self.__game.game_status.number_of_used_hints
+					score -= ( word_len / (self.__game.game_settings.map_wordlen_maxhints(wordlen=word_len) * 100)) * used_hints
+
+				current_tot_score = self.__game.game_status.score
+				if current_tot_score == 0 and score < 0:
+					current_tot_score = 0
+				else:
+					current_tot_score = (current_tot_score + score) / self.__game.game_status.round
+
+				self.__game.game_status.score = current_tot_score
+
 				section = "END POSITIVE ROUND" if self.__game.game_status.word_state.count(" ") == 0 else "END NEGATIVE ROUND"
 				self.__conductor.print(section=section)
+
+				# Show the entire word
+				for idx, lett in enumerate(current_word):
+					self.__game.write_guess_letter(current_pos=idx, key=lett)
+					curses.doupdate()
+					
 				time.sleep(5)
 
 		except (KeyboardInterrupt, EOFError):
