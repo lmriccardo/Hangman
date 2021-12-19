@@ -1,8 +1,8 @@
 import threading
 from typing import List
-from src.conductor.conductor import Conductor
-from src.game.game_state import GameStatus, GameSetting
-from src.util.config import *
+from conductor.cond import Conductor
+from game.game_state import GameStatus, GameSetting
+from util.config import *
 import curses
 from curses.textpad import rectangle
 import time
@@ -273,16 +273,7 @@ class Game:
         """
         Update the hangman inserting the part of the body specified in the input paramter kargs.
         So we have a dictionary of parameter that will be by default
-        {
-            "head" : "",
-            "larm" : "",
-            "body" : "",
-            "rarm" : "",
-            "lleg" : "",
-            "rleg" : "",
-            "lfoot": "",
-            "rfoot": ""
-        }
+        {"head" : "","larm" : "","body" : "","rarm" : "","lleg" : "","rleg" : "","lfoot": "","rfoot": ""}
         """
         self.__hangman_pad.clear()
         self.__hangman_pad.addstr(AsciiArt.HANGMAN.format(

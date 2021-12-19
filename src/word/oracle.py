@@ -1,9 +1,10 @@
 from typing import List, Generator
-from src.util.config import System
+from util.config import System
 import random
 
 
 class WordOracle:
+    """ Random word generator """
 
     def __init__(self) -> None:
         """ The init method """

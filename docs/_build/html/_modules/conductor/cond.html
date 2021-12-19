@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>conductor.cond &mdash; Hangman4CLI 1.0.0v documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link href="../../_static/stylesheet.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Hangman4CLI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">1. HANGMAN 4 CommandLine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">2. API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">3. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html#contact">4. Contact</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Hangman4CLI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>conductor.cond</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for conductor.cond</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">util.config</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">curses</span>
+<span class="kn">import</span> <span class="nn">pydub</span>
+<span class="kn">import</span> <span class="nn">pydub.playback</span> <span class="k">as</span> <span class="nn">playbck</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
+
+
+<div class="viewcode-block" id="Conductor"><a class="viewcode-back" href="../../conductor.html#conductor.cond.Conductor">[docs]</a><span class="k">class</span> <span class="nc">Conductor</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; The init method &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__msg_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>  <span class="c1"># Messages for each section of the conductor</span>
+            <span class="s2">&quot;START GAME&quot;</span>         <span class="p">:</span> <span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">Messages</span><span class="o">.</span><span class="n">START_GAME</span><span class="p">),</span> <span class="n">Colors</span><span class="o">.</span><span class="n">return_pair_for_index</span><span class="p">(</span><span class="n">Colors</span><span class="o">.</span><span class="n">START_GAME</span><span class="p">[</span><span class="mi">1</span><span class="p">])),</span>
+            <span class="s2">&quot;START ROUND&quot;</span>        <span class="p">:</span> <span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">Messages</span><span class="o">.</span><span class="n">START_ROUND</span><span class="p">),</span> <span class="n">Colors</span><span class="o">.</span><span class="n">return_pair_for_index</span><span class="p">(</span><span class="n">Colors</span><span class="o">.</span><span class="n">START_ROUND</span><span class="p">[</span><span class="mi">1</span><span class="p">])),</span>
+            <span class="s2">&quot;ON ERROR&quot;</span>           <span class="p">:</span> <span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">Messages</span><span class="o">.</span><span class="n">ON_ERROR</span><span class="p">),</span> <span class="n">Colors</span><span class="o">.</span><span class="n">return_pair_for_index</span><span class="p">(</span><span class="n">Colors</span><span class="o">.</span><span class="n">ON_ERROR</span><span class="p">[</span><span class="mi">1</span><span class="p">])),</span>
+            <span class="s2">&quot;NO HINT&quot;</span>            <span class="p">:</span> <span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">Messages</span><span class="o">.</span><span class="n">NO_HINT</span><span class="p">),</span>  <span class="n">Colors</span><span class="o">.</span><span class="n">return_pair_for_index</span><span class="p">(</span><span class="n">Colors</span><span class="o">.</span><span class="n">NO_HINT</span><span class="p">[</span><span class="mi">1</span><span class="p">])),</span>
+            <span class="s2">&quot;END POSITIVE ROUND&quot;</span> <span class="p">:</span> <span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">Messages</span><span class="o">.</span><span class="n">END_POSITIVE_ROUND</span><span class="p">),</span> <span class="n">Colors</span><span class="o">.</span><span class="n">return_pair_for_index</span><span class="p">(</span><span class="n">Colors</span><span class="o">.</span><span class="n">END_POSITIVE_ROUND</span><span class="p">[</span><span class="mi">1</span><span class="p">])),</span>
+            <span class="s2">&quot;END NEGATIVE ROUND&quot;</span> <span class="p">:</span> <span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">Messages</span><span class="o">.</span><span class="n">END_NEGATIVE_ROUND</span><span class="p">),</span> <span class="n">Colors</span><span class="o">.</span><span class="n">return_pair_for_index</span><span class="p">(</span><span class="n">Colors</span><span class="o">.</span><span class="n">END_NEGATIVE_ROUND</span><span class="p">[</span><span class="mi">1</span><span class="p">])),</span>
+            <span class="s2">&quot;END GAME&quot;</span>           <span class="p">:</span> <span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">Messages</span><span class="o">.</span><span class="n">END_GAME</span><span class="p">),</span> <span class="n">Colors</span><span class="o">.</span><span class="n">return_pair_for_index</span><span class="p">(</span><span class="n">Colors</span><span class="o">.</span><span class="n">END_GAME</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__window</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__conductor_pad</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># If there is at least a message in the pad</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__thereis_message</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__messages_current_max_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__messages_current_max_h</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Get the sound of the typewriter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__type_writer_sound</span> <span class="o">=</span> <span class="n">pydub</span><span class="o">.</span><span class="n">AudioSegment</span><span class="o">.</span><span class="n">from_mp3</span><span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="n">TYPEWRITER_MUSIC</span><span class="p">)[:</span><span class="o">-</span><span class="mi">100</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__type_writer_sound</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__type_writer_sound</span> <span class="o">*</span> <span class="mi">6</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__type_writer_sound</span><span class="p">[:</span><span class="o">-</span><span class="mi">1000</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__type_writer_sound</span> <span class="o">-=</span> <span class="mi">30</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">window</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return the window of the conductor &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__window</span>
+
+    <span class="nd">@window</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">window</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Set the new value for the attribute window &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__window</span> <span class="o">=</span> <span class="n">new_value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">conductor_pad</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return the pad where the conductor write messages &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__conductor_pad</span>
+
+    <span class="nd">@conductor_pad</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">conductor_pad</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Set a new value for the attribute conductor_pad &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__conductor_pad</span> <span class="o">=</span> <span class="n">new_value</span>
+
+<div class="viewcode-block" id="Conductor.initialize_container"><a class="viewcode-back" href="../../conductor.html#conductor.cond.Conductor.initialize_container">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">initialize_container</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">curses</span><span class="o">.</span><span class="n">window</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot; Initialize the new container for the conductor messages &quot;&quot;&quot;</span>
+        <span class="n">y_postion</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">AsciiArt</span><span class="o">.</span><span class="n">TITLE</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span> <span class="c1"># The +2s are the padding</span>
+        <span class="n">conductor_window</span> <span class="o">=</span> <span class="n">curses</span><span class="o">.</span><span class="n">newwin</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="n">curses</span><span class="o">.</span><span class="n">COLS</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="n">y_postion</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">conductor_window</span><span class="o">.</span><span class="n">nodelay</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">conductor_window</span><span class="o">.</span><span class="n">box</span><span class="p">()</span>
+        <span class="n">conductor_window</span><span class="o">.</span><span class="n">addstr</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;Conductor&quot;</span><span class="p">,</span> <span class="n">Colors</span><span class="o">.</span><span class="n">return_pair_for_index</span><span class="p">(</span><span class="n">Colors</span><span class="o">.</span><span class="n">TITLE</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">|</span> <span class="n">curses</span><span class="o">.</span><span class="n">A_UNDERLINE</span><span class="p">)</span>
+        <span class="n">conductor_window</span><span class="o">.</span><span class="n">noutrefresh</span><span class="p">()</span>
+
+        <span class="n">conductor_pad</span> <span class="o">=</span> <span class="n">curses</span><span class="o">.</span><span class="n">newpad</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">conductor_window</span><span class="p">,</span> <span class="n">conductor_pad</span></div>
+
+<div class="viewcode-block" id="Conductor.add_condactor_art"><a class="viewcode-back" href="../../conductor.html#conductor.cond.Conductor.add_condactor_art">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">add_condactor_art</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Add the Ascii Art of the conductor &quot;&quot;&quot;</span>
+        <span class="n">conductor_pad</span> <span class="o">=</span> <span class="n">curses</span><span class="o">.</span><span class="n">newpad</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">conductor_pad</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">conductor_pad</span><span class="o">.</span><span class="n">addstr</span><span class="p">(</span><span class="n">AsciiArt</span><span class="o">.</span><span class="n">CONDUCTOR</span><span class="p">,</span> <span class="n">curses</span><span class="o">.</span><span class="n">A_BOLD</span><span class="p">)</span>
+        <span class="n">conductor_pad</span><span class="o">.</span><span class="n">noutrefresh</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="n">curses</span><span class="o">.</span><span class="n">COLS</span> <span class="o">-</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="n">curses</span><span class="o">.</span><span class="n">COLS</span> <span class="o">-</span> <span class="mi">9</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Conductor.print"><a class="viewcode-back" href="../../conductor.html#conductor.cond.Conductor.print">[docs]</a>    <span class="k">def</span> <span class="nf">print</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Print the messages of the corresponding section &quot;&quot;&quot;</span>
+        <span class="n">music_thread</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">playbck</span><span class="o">.</span><span class="n">play</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__type_writer_sound</span><span class="p">,))</span>
+        <span class="n">music_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="n">lines</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__msg_dict</span><span class="p">[</span><span class="n">section</span><span class="p">]</span>
+        <span class="n">y_postion</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">AsciiArt</span><span class="o">.</span><span class="n">TITLE</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">max_len</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">max_heigth</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># First clear</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__thereis_message</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__conductor_pad</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__conductor_pad</span><span class="o">.</span><span class="n">refresh</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">y_postion</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__messages_current_max_h</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__messages_current_max_len</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="mi">3</span>
+            <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__conductor_pad</span><span class="o">.</span><span class="n">addstr</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">char</span><span class="p">,</span> <span class="n">color</span> <span class="o">|</span> <span class="n">curses</span><span class="o">.</span><span class="n">A_BOLD</span><span class="p">)</span>
+                <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">j</span> <span class="o">&gt;</span> <span class="n">max_len</span><span class="p">:</span>
+                    <span class="n">max_len</span> <span class="o">=</span> <span class="n">j</span>
+
+                <span class="n">max_heigth</span> <span class="o">=</span> <span class="n">y_postion</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">i</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__conductor_pad</span><span class="o">.</span><span class="n">refresh</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">y_postion</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">max_heigth</span><span class="p">,</span> <span class="n">max_len</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.005</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__thereis_message</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__messages_current_max_len</span> <span class="o">=</span> <span class="n">max_len</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__messages_current_max_h</span> <span class="o">=</span> <span class="n">max_heigth</span>
+
+        <span class="n">music_thread</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Riccardo La Marca.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

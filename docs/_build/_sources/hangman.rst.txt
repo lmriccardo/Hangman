@@ -1,0 +1,13 @@
+:obj:`src`
+==============
+
+This page contain an overview of all the module inside :obj:`src`
+
+.. toctree::
+    :caption: Module overview
+
+    wordoracle
+    conductor
+    game
+    config
+    main

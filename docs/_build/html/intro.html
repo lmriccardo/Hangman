@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>1. HANGMAN 4 CommandLine &mdash; Hangman4CLI 1.0.0v documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="2. API Documentation" href="api.html" />
+    <link rel="prev" title="Welcome to Hangman4CLI’s documentation!" href="index.html" />
+    <link href="_static/stylesheet.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Hangman4CLI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">1. HANGMAN 4 CommandLine</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">1.1. Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#additions-to-hangman">1.2. Additions to Hangman</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#game-modes">1.3. Game Modes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#requirements">1.4. Requirements</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#install-curses-on-windows">1.4.1. Install curses on Windows</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#install-ffmpeg">1.4.2. Install ffmpeg</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#run-the-game">1.5. Run the game</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-output">1.6. The output</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">2. API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">3. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html#contact">4. Contact</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Hangman4CLI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><span class="section-number">1. </span>HANGMAN 4 CommandLine</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/intro.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="hangman-4-commandline">
+<h1><span class="section-number">1. </span>HANGMAN 4 CommandLine<a class="headerlink" href="#hangman-4-commandline" title="Permalink to this headline"></a></h1>
+<p>This game is created using Python with the module curses</p>
+<section id="introduction">
+<h2><span class="section-number">1.1. </span>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline"></a></h2>
+<p>The Hangman game is a very old game in which there are two players and two respective role (I suppose): the <strong>Conductor</strong> and the <strong>Guesser</strong>. The first one must thinks at one word (hard or simple) to be shown to the second one, which goal is to guess that word. That is, the conductor write in a board only the first letter of the chosen word, while all the others are hidden and indicated with a simple underscore symbol. That means the guesser knows both the first letter and the length of the puzzle. Finally, in addition to the word displayed on the board, is displayed also the hangman like that</p>
+<pre>
+-------------\
+=============
+|█          |
+|█          O
+|█         /|\
+|█        _/ \_
+|█
+|█
+|█
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+###################
+</pre><p>At the start of the game the hangman is empty, so there is no head, body, arms and legs. For each wrong guess of the second player a part of the body is added in this order: head, body, left arm, right arm, left leg, right leg, left foot and right foot. At the end of the game, the guesser loses if all the part have been inserted, otherwise he wins.</p>
+</section>
+<section id="additions-to-hangman">
+<h2><span class="section-number">1.2. </span>Additions to Hangman<a class="headerlink" href="#additions-to-hangman" title="Permalink to this headline"></a></h2>
+<p>In this version of the game I did some additions to the original one. The first, and the main one, is that the user (who play the role of the guesser) can now choose with which difficulty he wants to play. There are four main difficulty: <em>Easy</em> (E), <em>Medium</em> (M), <em>Hard</em> (H) and <em>Very Hard</em> (VH, the last one is very hard). In the following section we are gonna explore each of them. In summary, the main differences between all the difficulty are regarding:</p>
+<ol class="arabic simple">
+<li><p>the minimum and the maximum length of the word that the user has to guess;</p></li>
+<li><p>which letters of the words are already shown;</p></li>
+<li><p>the number of hints the user has for each round;</p></li>
+<li><p>the amount of time the user has to finish one round;</p></li>
+<li><p>the penalty for each wrong try (in a single round);</p></li>
+<li><p>the penalty for each used hint (in a single round, but it affects the final total score).</p></li>
+</ol>
+<p>Note that, the last one is valid only for the Very Hard mode, since in a different mode the user has no penalty for have used a hint. Also, the 5-th difference change only in the VH-mode in fact, while in all the other cases only a single part of the body is added if the user has a wrong guess, in this difficulty for a single error two part of body are inserted (head and body, then all the arms, then all the legs and, finally, the feet).</p>
+<p>Obviously, there are more additions. The second one is that there is a precise number of round (10) for each game, and the user needs to pass correct all of them in order to achieve the maximum total score. Note that, the score is expressed in percentage so, a totally correct round will give the reward of a 100%. This means, that the maximum total score is 100%. In general, the total score is the sum of the score for each round divided by the total number of round.</p>
+<p>Finally, other additions are:</p>
+<ul>
+<li><p>the score;</p></li>
+<li><p>the countdown timer for each round;</p></li>
+<li><p>the hints (they are not in the original game);</p></li>
+<li><p>higher the difficulty, more letter are already shown (in the original only the first);</p>
+<blockquote>
+<div><p>Note (HINT): using an hint means showing the letter where the user has currently the cursor</p>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="game-modes">
+<h2><span class="section-number">1.3. </span>Game Modes<a class="headerlink" href="#game-modes" title="Permalink to this headline"></a></h2>
+<p>As we have already said, there are four game mode: E, M, H and VH. Let’s explore them.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 8%" />
+<col style="width: 13%" />
+<col style="width: 13%" />
+<col style="width: 13%" />
+<col style="width: 7%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 13%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"></th>
+<th class="head"><p>N.
+Ro
+und</p></th>
+<th class="head"><p>Time x
+Round</p></th>
+<th class="head"><p>Min
+Word
+Len</p></th>
+<th class="head"><p>Max
+Word
+Len</p></th>
+<th class="head"><p>P
+en
+al
+ty</p></th>
+<th class="head"><p>Min
+Hint
+N.</p></th>
+<th class="head"><p>Max
+Hint
+N.</p></th>
+<th class="head"><p>Hint
+P
+enalty</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Easy</p></td>
+<td><p>10</p></td>
+<td><p>60 sec</p></td>
+<td><p>5</p></td>
+<td><p>7</p></td>
+<td><p>1</p></td>
+<td><p>3</p></td>
+<td><p>5</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>Me
+dium</p></td>
+<td><p>10</p></td>
+<td><p>300
+sec</p></td>
+<td><p>7</p></td>
+<td><p>9</p></td>
+<td><p>1</p></td>
+<td><p>2</p></td>
+<td><p>4</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>Hard</p></td>
+<td><p>10</p></td>
+<td><p>600
+sec</p></td>
+<td><p>9</p></td>
+<td><p>11</p></td>
+<td><p>1</p></td>
+<td><p>1</p></td>
+<td><p>3</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>Very
+Hard</p></td>
+<td><p>10</p></td>
+<td><p>1200
+sec</p></td>
+<td><p>11</p></td>
+<td><p>18</p></td>
+<td><p>2</p></td>
+<td><p>1</p></td>
+<td><p>3</p></td>
+<td><p>1</p></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<div><p>Note (HINT PENALTY): except for the first three modes, the VH-mode
+has the column <em>Hint Penalty</em> set to 1. What does It mean? It means
+that at the end of the round the total score would be 0 if the user
+has lost, otherwise is the 100 - (word_len / (max_hint * 100)) *
+number_used_hints * hint_penalty. So, if <em>Hint penalty</em> is 0 then
+the score will remain the same (either 100 or 0).</p>
+</div></blockquote>
+<p>There is also another difference between the difficulty:</p>
+<ul class="simple">
+<li><p>E Mode: only the first letter is shown at the start</p></li>
+<li><p>M Mode: both the first and the last one letters are yet shown</p></li>
+<li><p>H and VH Mode: first, middle and last letters are yet shown</p></li>
+</ul>
+</section>
+<section id="requirements">
+<h2><span class="section-number">1.4. </span>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline"></a></h2>
+<p>We have some requirements:</p>
+<ul class="simple">
+<li><p>art==5.3 (for ASCII ART)</p></li>
+<li><p>pydub==0.25.1 (in order to play the music)</p></li>
+<li><p>simpleaudio==1.0.4 (support for pydub)</p></li>
+<li><p>curses (already installed in Unix/MacOS)</p></li>
+</ul>
+<p>All of them are installable via pip using <code class="code docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">name==ver</span></code>, or directly using the requirements.txt file <code class="code docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-r</span> <span class="pre">requirements.txt</span></code>. If you are using Linux and pip is not available then use <code class="code docutils literal notranslate"><span class="pre">python3</span> <span class="pre">-m</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">…</span></code>, otherwise first install pip using <code class="code docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">-y</span> <span class="pre">python3-pip</span></code> and then use the previous method.</p>
+<p>Some external requirements:
++ Linux/MaxOS (suggested, no need to install curses and colors may don’t work);
++ install ffmpeg (to play the bkg music)
++ use Python 3.9 or above (<strong>MANDATORY</strong>)</p>
+<section id="install-curses-on-windows">
+<h3><span class="section-number">1.4.1. </span>Install curses on Windows<a class="headerlink" href="#install-curses-on-windows" title="Permalink to this headline"></a></h3>
+<p>Sadly, curses is not a module of the standard library of Python in Windows. In order to install it, you need to install NCurses and you can do it from <a class="reference external" href="https://invisible-island.net/ncurses/">here</a>. Otherwise, you can try to install from MinGW: look at <a class="reference external" href="https://e-l.unifi.it/pluginfile.php/805205/mod_resource/content/0/ncurses%20installation%20-%20en.pdf">this</a>. However, It really suggested to used a Unix-based OS.</p>
+</section>
+<section id="install-ffmpeg">
+<h3><span class="section-number">1.4.2. </span>Install ffmpeg<a class="headerlink" href="#install-ffmpeg" title="Permalink to this headline"></a></h3>
+<p>In MacOS, it is really simple, just open a terminal and use sudo brew install ffmpeg. Otherwise, if you are in Linux first update the repo sudo apt-get update and then install the package <code class="code docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">-y</span> <span class="pre">ffmpeg</span></code>. In windows, please search over the internet (I’m sorry bro).</p>
+</section>
+</section>
+<section id="run-the-game">
+<h2><span class="section-number">1.5. </span>Run the game<a class="headerlink" href="#run-the-game" title="Permalink to this headline"></a></h2>
+<p>There are two ways to download this game. The first one is through pip module. Essentially, after done pip install hangman, <strong>PLEASE MAKE SURE YOU ARE IN A FULL SCREEN TERMINAL</strong> you can run it with <code class="code docutils literal notranslate"><span class="pre">python[ver]</span> <span class="pre">hangman</span></code>, where [ver] is the current version of python you are using to run the game. Another suggestion, if I can, is to create a python virtual environment, before running the game. It is very simple:</p>
+<ol class="arabic simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">python[ver]</span> <span class="pre">-m</span> <span class="pre">venv</span> <span class="pre">venv_name</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">source</span> <span class="pre">venv_name/bin/activate</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">hangman</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">python</span> <span class="pre">hangman</span></code></p></li>
+</ol>
+<p>In Windows the second point change and become <code class="code docutils literal notranslate"><span class="pre">\venv_name\Scripts\activate</span></code>. Be careful, this may don’t work and return the error <em>cannot be loaded because the execution of scripts is disabled on this system</em>. In this situation there are two ways to solve the problem (both changing policy restriction). Open your windows PowersShell in the current folder where you want to execute the game and write one of the two commands:</p>
+<ol class="arabic simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">Set-ExecutionPolicy</span> <span class="pre">Unrestricted</span> <span class="pre">-Scope</span> <span class="pre">Process</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">Set-ExecutionPolicy</span> <span class="pre">Unrestricted</span> <span class="pre">-Force</span></code></p></li>
+</ol>
+<p>the main difference is that the first one is regard the current process (so, the current PowerShell), while the second one is for the entire system.</p>
+<p>The second method to download the game is through git. Just do the following steps:</p>
+<ol class="arabic simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">-b</span> <span class="pre">cli_hangman</span> <span class="pre">https://github.com/lmriccardo/Hangman.git</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">cd</span> <span class="pre">Hangman</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">Create</span> <span class="pre">the</span> <span class="pre">virtual</span> <span class="pre">env</span> <span class="pre">and</span> <span class="pre">activate</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-r</span> <span class="pre">requirements.txt</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">src.hangman</span></code></p></li>
+</ol>
+</section>
+<section id="the-output">
+<h2><span class="section-number">1.6. </span>The output<a class="headerlink" href="#the-output" title="Permalink to this headline"></a></h2>
+<p>After executing the game the conductor will introduce you to the Hangman game. When it finished to talk, the game will ask you with which difficulty you wanna play.</p>
+<p><img alt="image0" src="https://i.imgur.com/s7zZNQh.png" /></p>
+<p>the user can choose the difficulty simply moving with the arrows and then press ENTER. Once the user has chosen the difficulty, the game can start. Instead of displaying the difficulty question, inside the Hangman Game windows there are 4 sections. The first one (or the upper left) contains the hangman and the word the user has to guess. The botton left section is a logging window in which every action of the user is logged. The upper right mini-window display the game settings. Finally, the bottom right section display the game status. In addition, the title of the game window has changed displaying not only the original title but also the difficulty, some actions (1 to use hint and CTRL + c to quit the game) and finally the timer (on the right side).</p>
+<p><img alt="image1" src="https://imgur.com/cYASZsQ.png" /></p>
+<p>The user can insert the letter that wants to try using the corresponding key on the keyboard. At the end of each round the user can wait 5 seconds before the next round start.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to Hangman4CLI’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api.html" class="btn btn-neutral float-right" title="2. API Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Riccardo La Marca.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

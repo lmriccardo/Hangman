@@ -1,5 +1,5 @@
 from typing import List, Optional, Tuple
-from src.util.config import GameSettings
+from util.config import GameSettings
 
 
 class GameSetting:

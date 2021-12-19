@@ -1,10 +1,10 @@
 import multiprocessing
 import time
 from typing import List
-from src.conductor.conductor import Conductor
-from src.word.oracle import WordOracle
-from src.game.game import Game
-from src.util.config import *
+from conductor.cond import Conductor
+from word.oracle import WordOracle
+from game.game_obj import Game
+from util.config import *
 import curses
 import pydub
 import pydub.playback as playbck

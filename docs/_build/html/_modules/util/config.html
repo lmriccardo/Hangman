@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>util.config &mdash; Hangman4CLI 1.0.0v documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link href="../../_static/stylesheet.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Hangman4CLI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">1. HANGMAN 4 CommandLine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">2. API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">3. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html#contact">4. Contact</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Hangman4CLI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>util.config</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for util.config</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">art</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">curses</span>
+<span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">osp</span>
+
+
+<span class="c1"># Splitter for path in python, wrt the operating system</span>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">System</span><span class="p">:</span>
+    <span class="n">PATH_SPLITTER</span>   <span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s2">&quot;win32&quot;</span> <span class="k">else</span> <span class="s2">&quot;/&quot;</span>
+    <span class="n">SCIFI_MUSIC</span>     <span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">osp</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH_SPLITTER</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="vm">__file__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">PATH_SPLITTER</span><span class="p">)[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]),</span> <span class="s2">&quot;music/scifi.mp3&quot;</span><span class="p">)</span>
+    <span class="n">TYPEWRITER_MUSIC</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">osp</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH_SPLITTER</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="vm">__file__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">PATH_SPLITTER</span><span class="p">)[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]),</span> <span class="s2">&quot;music/writer.mp3&quot;</span><span class="p">)</span>
+    <span class="n">WORDS_FILE</span>      <span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">osp</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PATH_SPLITTER</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="vm">__file__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">PATH_SPLITTER</span><span class="p">)[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]),</span> <span class="s2">&quot;word/words_ita.txt&quot;</span><span class="p">)</span>
+
+
+<span class="c1"># Constant name for conductor message</span>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Messages</span><span class="p">:</span>
+    <span class="n">START_GAME</span>        <span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Hi, Welcome in the Hangman game!&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;In each round a word will be selected&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Some of its letters are yet shown&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Your goal is to guess as many words as you can&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Be careful! You have limited time&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Select the char textbox using arrows&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Write a letter using the corresponding key&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">START_ROUND</span>       <span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;A new round has started&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Go! Remember, you have limited time&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">ON_ERROR</span>          <span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Oh No! You miss that&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">NO_HINT</span>           <span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;You have no more hints!&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">END_POSITIVE_ROUND</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Well done! Let start another round&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;You have 5 seconds breath&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">END_NEGATIVE_ROUND</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Don&#39;t give up!&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;You will do better in the next round&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;You have 5 seconds breath&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">END_GAME</span>          <span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;The game has ended.&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Score: &quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">ASK_DIFFICULTY</span>    <span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Choose which difficulty you wanna play with&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">INFO_DIFFICULTY</span>   <span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> ... Do You wanna something </span><span class="si">{1}</span><span class="s2">?&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Ok, Let&#39;s do it ... Remember you have </span><span class="si">{0}</span><span class="s2"> seconds per round&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Up to </span><span class="si">{0}</span><span class="s2"> round, with max score each of </span><span class="si">{1}</span><span class="s2"> (in percentage)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;The word queried can be </span><span class="si">{0}</span><span class="s2"> lenght, and for each wrong guess </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;part of the body will be added to the hangman.&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;You can have </span><span class="si">{0}</span><span class="s2"> hint, and for each used hint you will have </span><span class="si">{1}</span><span class="s2"> penalty.&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;The hint penalty regard the total score. In fact, from the total score&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;a scalar of (len of the current word) / (max number of hint * 100) for each used hint&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="c1"># Constant for ascii art of the game</span>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">AsciiArt</span><span class="p">:</span>
+    <span class="n">TITLE</span>            <span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">text2art</span><span class="p">(</span><span class="s2">&quot;CMD-Line HANGMAN&quot;</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="s2">&quot;contrast&quot;</span><span class="p">)</span>
+    <span class="n">HANGMAN</span>          <span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;-------------</span><span class="se">\n</span><span class="s2">&quot;</span>\
+                             <span class="s2">&quot;=============</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> \
+                             <span class="s2">&quot;|█          |</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> \
+                             <span class="s2">&quot;|█          </span><span class="si">{head}</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> \
+                             <span class="s2">&quot;|█         </span><span class="si">{larm}{body}{rarm}</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> \
+                             <span class="s2">&quot;|█        </span><span class="si">{lfoot}{lleg}</span><span class="s2"> </span><span class="si">{rleg}{rfoot}</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> \
+                             <span class="s2">&quot;|█          </span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> \
+                             <span class="s2">&quot;|█          </span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> \
+                             <span class="s2">&quot;|█          </span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> \
+                             <span class="s2">&quot;▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> \
+                             <span class="s2">&quot;###################</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">HANGMAN_HEAD</span>     <span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;O&quot;</span>
+    <span class="n">HANGMAN_BODY</span>     <span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;|&quot;</span>
+    <span class="n">HANGMAN_LEFT_ARM</span> <span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span>
+    <span class="n">HANGMAN_LEFT_LEG</span> <span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span>
+    <span class="n">HANGMAN_RIGHT_ARM</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span>
+    <span class="n">HANGMAN_RIGHT_LEG</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span>
+    <span class="n">HANGMAN_FOOT</span>     <span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span>
+    <span class="n">CONDUCTOR</span>        <span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;───────▄██████▄───────</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> \
+                             <span class="s2">&quot;──────▐▀▀▀▀▀▀▀▀▌──────</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> \
+                             <span class="s2">&quot;──────▌▌▀▀▌▐▀▀▐▐──────</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> \
+                             <span class="s2">&quot;──────▐──▄▄▄▄──▌──────</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> \
+                             <span class="s2">&quot;───────▌▐▌──▐▌▐───────</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+
+<span class="c1"># Constant for specified colors</span>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Colors</span><span class="p">:</span>
+    <span class="n">__black</span><span class="p">:</span> <span class="nb">int</span>  <span class="o">=</span> <span class="n">curses</span><span class="o">.</span><span class="n">COLOR_BLACK</span>
+    <span class="n">__setup</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">TITLE</span>             <span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">curses</span><span class="o">.</span><span class="n">COLOR_YELLOW</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">START_GAME</span>        <span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">curses</span><span class="o">.</span><span class="n">COLOR_GREEN</span><span class="p">,</span>  <span class="mi">2</span><span class="p">)</span>
+    <span class="n">START_ROUND</span>       <span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">curses</span><span class="o">.</span><span class="n">COLOR_YELLOW</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">ON_ERROR</span>          <span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">curses</span><span class="o">.</span><span class="n">COLOR_RED</span><span class="p">,</span>    <span class="mi">3</span><span class="p">)</span>
+    <span class="n">NO_HINT</span>           <span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">curses</span><span class="o">.</span><span class="n">COLOR_RED</span><span class="p">,</span>    <span class="mi">3</span><span class="p">)</span>
+    <span class="n">END_POSITIVE_ROUND</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">curses</span><span class="o">.</span><span class="n">COLOR_BLUE</span><span class="p">,</span>   <span class="mi">4</span><span class="p">)</span>
+    <span class="n">END_NEGATIVE_ROUND</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">curses</span><span class="o">.</span><span class="n">COLOR_RED</span><span class="p">,</span>    <span class="mi">3</span><span class="p">)</span>
+    <span class="n">END_GAME</span>          <span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">curses</span><span class="o">.</span><span class="n">COLOR_GREEN</span><span class="p">,</span>  <span class="mi">2</span><span class="p">)</span>
+    <span class="n">HANGMAN_CORRECT</span>   <span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">curses</span><span class="o">.</span><span class="n">COLOR_GREEN</span><span class="p">,</span>  <span class="mi">2</span><span class="p">)</span>
+    <span class="n">HANGMAN_ERROR</span>     <span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">curses</span><span class="o">.</span><span class="n">COLOR_RED</span><span class="p">,</span>    <span class="mi">3</span><span class="p">)</span>
+    <span class="n">GAME_BORDER_WIN</span>   <span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">curses</span><span class="o">.</span><span class="n">COLOR_RED</span><span class="p">,</span>    <span class="mi">3</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">black</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__black</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__setup</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">set_setup</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_value</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">__setup</span> <span class="o">=</span> <span class="n">new_value</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">setup_colors</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Setup the colors generating the pairs &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">setup</span><span class="p">():</span>
+            <span class="n">curses</span><span class="o">.</span><span class="n">init_pair</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">curses</span><span class="o">.</span><span class="n">COLOR_YELLOW</span><span class="p">,</span> <span class="n">curses</span><span class="o">.</span><span class="n">COLOR_BLACK</span><span class="p">)</span>
+            <span class="n">curses</span><span class="o">.</span><span class="n">init_pair</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">curses</span><span class="o">.</span><span class="n">COLOR_GREEN</span><span class="p">,</span> <span class="n">curses</span><span class="o">.</span><span class="n">COLOR_BLACK</span><span class="p">)</span>
+            <span class="n">curses</span><span class="o">.</span><span class="n">init_pair</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">curses</span><span class="o">.</span><span class="n">COLOR_RED</span><span class="p">,</span> <span class="n">curses</span><span class="o">.</span><span class="n">COLOR_BLACK</span><span class="p">)</span>
+            <span class="n">curses</span><span class="o">.</span><span class="n">init_pair</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">curses</span><span class="o">.</span><span class="n">COLOR_BLUE</span><span class="p">,</span> <span class="n">curses</span><span class="o">.</span><span class="n">COLOR_BLACK</span><span class="p">)</span>
+
+            <span class="bp">cls</span><span class="o">.</span><span class="n">set_setup</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">return_pair_for_index</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">color_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Return the corresponding pair identifier &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">curses</span><span class="o">.</span><span class="n">color_pair</span><span class="p">(</span><span class="n">color_index</span><span class="p">)</span>
+
+
+<span class="c1"># Recall all the settings for each game&#39;s difficulty</span>
+<div class="viewcode-block" id="GameSettings"><a class="viewcode-back" href="../../game.html#game.game_state.GameSettings">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">GameSettings</span><span class="p">:</span>
+    <span class="n">__SettingDictType</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]]</span>
+
+    <span class="n">MAX_ROUND_TIME</span><span class="p">:</span>   <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;MAX ROUND TIME&quot;</span>
+    <span class="n">TOT_ROUND_NUMBER</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;TOT ROUND NUMBER&quot;</span>
+    <span class="n">GAME_DIFFICULTY</span><span class="p">:</span>  <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;GAME DIFFICULTY&quot;</span>
+    <span class="n">MAX_ROUND_SCORE</span><span class="p">:</span>  <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;MAX ROUND SCORE&quot;</span>
+    <span class="n">WORD_LENGTH</span><span class="p">:</span>      <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;WORD LENGHT&quot;</span>
+    <span class="n">PENALTY</span><span class="p">:</span>          <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;PENALTY&quot;</span>
+    <span class="n">HINT_NUMBER</span><span class="p">:</span>      <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;HINT NUMBER&quot;</span>
+    <span class="n">HINT_PENALTY</span><span class="p">:</span>     <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;HINT PENALTY&quot;</span>
+    <span class="n">INTRO</span><span class="p">:</span>            <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;INTRO&quot;</span>
+
+    <span class="n">EASY_SETUP</span><span class="p">:</span> <span class="n">__SettingDictType</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="s2">&quot;MAX ROUND TIME&quot;</span><span class="p">,</span>        <span class="mi">60</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;TOT ROUND NUMBER&quot;</span><span class="p">,</span>      <span class="mi">10</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;GAME DIFFICULTY&quot;</span><span class="p">,</span>   <span class="s2">&quot;Easy&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;MAX ROUND SCORE&quot;</span><span class="p">,</span>      <span class="mi">100</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;WORD LENGHT&quot;</span><span class="p">,</span>       <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s2">&quot;PENALTY&quot;</span><span class="p">,</span>                <span class="mi">1</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;HINT NUMBER&quot;</span><span class="p">,</span>       <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s2">&quot;HINT PENALTY&quot;</span><span class="p">,</span>           <span class="mi">0</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;INTRO&quot;</span><span class="p">,</span><span class="s2">&quot;You stupid newbie&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">MEDIUM_SETUP</span><span class="p">:</span> <span class="n">__SettingDictType</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="s2">&quot;MAX ROUND TIME&quot;</span><span class="p">,</span>       <span class="mi">300</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;TOT ROUND NUMBER&quot;</span><span class="p">,</span>      <span class="mi">10</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;GAME DIFFICULTY&quot;</span><span class="p">,</span> <span class="s2">&quot;Medium&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;MAX ROUND SCORE&quot;</span><span class="p">,</span>      <span class="mi">100</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;WORD LENGHT&quot;</span><span class="p">,</span>       <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s2">&quot;PENALTY&quot;</span><span class="p">,</span>                <span class="mi">1</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;HINT NUMBER&quot;</span><span class="p">,</span>       <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s2">&quot;HINT PENALTY&quot;</span><span class="p">,</span>           <span class="mi">0</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;INTRO&quot;</span><span class="p">,</span><span class="s2">&quot;You that avoid difficulties&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">HARD_SETUP</span><span class="p">:</span> <span class="n">__SettingDictType</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="s2">&quot;MAX ROUND TIME&quot;</span><span class="p">,</span>       <span class="mi">600</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;TOT ROUND NUMBER&quot;</span><span class="p">,</span>      <span class="mi">10</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;GAME DIFFICULTY&quot;</span><span class="p">,</span>   <span class="s2">&quot;Hard&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;MAX ROUND SCORE&quot;</span><span class="p">,</span>      <span class="mi">100</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;WORD LENGHT&quot;</span><span class="p">,</span>      <span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">11</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s2">&quot;PENALTY&quot;</span><span class="p">,</span>                <span class="mi">1</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;HINT NUMBER&quot;</span><span class="p">,</span>       <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s2">&quot;HINT PENALTY&quot;</span><span class="p">,</span>           <span class="mi">0</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;INTRO&quot;</span><span class="p">,</span>      <span class="s2">&quot;You foolish&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">VERY_HARD_SETUP</span><span class="p">:</span> <span class="n">__SettingDictType</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="s2">&quot;MAX ROUND TIME&quot;</span><span class="p">,</span>           <span class="mi">1200</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;TOT ROUND NUMBER&quot;</span><span class="p">,</span>           <span class="mi">10</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;GAME DIFFICULTY&quot;</span><span class="p">,</span>   <span class="s2">&quot;Very Hard&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;MAX ROUND SCORE&quot;</span><span class="p">,</span>           <span class="mi">100</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;WORD LENGHT&quot;</span><span class="p">,</span>          <span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">18</span><span class="p">)),</span> <span class="c1"># -1 means maximum</span>
+        <span class="p">(</span><span class="s2">&quot;PENALTY&quot;</span><span class="p">,</span>                     <span class="mi">2</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;HINT NUMBER&quot;</span><span class="p">,</span>          <span class="p">(</span><span class="mi">1</span><span class="p">,</span>   <span class="mi">3</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s2">&quot;HINT PENALTY&quot;</span><span class="p">,</span>                <span class="mi">1</span><span class="p">),</span>  <span class="c1"># Final score -= len(word) / (max_hint * 100)</span>
+        <span class="p">(</span><span class="s2">&quot;INTRO&quot;</span><span class="p">,</span>    <span class="s2">&quot;You stupid foolish&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="GameSettings.get_settings"><a class="viewcode-back" href="../../game.html#game.game_state.GameSettings.get_settings">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_settings</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">difficulty</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]:</span>
+        <span class="sd">&quot;&quot;&quot; Return the setting of the corresponding difficulty &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;Easy&quot;</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">EASY_SETUP</span><span class="p">,</span>
+                <span class="s2">&quot;Medium&quot;</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">MEDIUM_SETUP</span><span class="p">,</span>
+                <span class="s2">&quot;Hard&quot;</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">HARD_SETUP</span><span class="p">,</span>
+                <span class="s2">&quot;Very Hard&quot;</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">VERY_HARD_SETUP</span>
+            <span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">difficulty</span><span class="p">)</span>
+        <span class="p">)</span></div></div>
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">LogMessages</span><span class="p">:</span>
+    <span class="n">BOX_SELECTION</span><span class="p">:</span>  <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;You move the cursor to position </span><span class="si">%s</span><span class="s2">&quot;</span>
+    <span class="n">CHAR_INSERTION</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;You have tried the letter </span><span class="si">%s</span><span class="s2">&quot;</span>
+    <span class="n">RIGTH_GUESS</span><span class="p">:</span>    <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;The letter </span><span class="si">%s</span><span class="s2"> is the right one&quot;</span>
+    <span class="n">WRONG_GUESS</span><span class="p">:</span>    <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;The letter </span><span class="si">%s</span><span class="s2"> is wrong!&quot;</span>
+    <span class="n">ADD_BODY_PART</span><span class="p">:</span>  <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Updated the hangman with </span><span class="si">%s</span><span class="s2">&quot;</span>
+    <span class="n">HINT_USED</span><span class="p">:</span>      <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Using the hint number </span><span class="si">%s</span><span class="s2">&quot;</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Char</span><span class="p">:</span>
+    <span class="n">NORMAL_CHAR</span> <span class="o">=</span> <span class="p">[</span><span class="nb">chr</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">),</span> <span class="nb">ord</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+    <span class="n">NUMBERS</span>     <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)]</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Riccardo La Marca.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

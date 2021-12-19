@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>game.game_state &mdash; Hangman4CLI 1.0.0v documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link href="../../_static/stylesheet.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Hangman4CLI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">1. HANGMAN 4 CommandLine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">2. API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">3. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html#contact">4. Contact</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Hangman4CLI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>game.game_state</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for game.game_state</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">util.config</span> <span class="kn">import</span> <span class="n">GameSettings</span>
+
+
+<span class="k">class</span> <span class="nc">GameSetting</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Describe the setting of the current game in terms of:</span>
+<span class="sd">    - Max time per round (sec)</span>
+<span class="sd">    - Total Number of round</span>
+<span class="sd">    - Game difficulty (Easy, Medium, Hard, Very Hard)</span>
+<span class="sd">    - Max round score</span>
+<span class="sd">    - Word lenght range (min, max)</span>
+<span class="sd">    - Penalty (how many parts of the body to add)</span>
+<span class="sd">    - Number of hint&#39;s range (min, max), obv depends upon the len of the word</span>
+<span class="sd">    - Hint penalty (drop a scalar from the max score of the current word)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">game_difficulty</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Hard&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; The init method &quot;&quot;&quot;</span>
+        <span class="c1"># If the game difficulty is given then take the default settings</span>
+        <span class="k">if</span> <span class="n">game_difficulty</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__settings</span> <span class="o">=</span> <span class="n">GameSettings</span><span class="o">.</span><span class="n">get_settings</span><span class="p">(</span><span class="n">game_difficulty</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">GameSetting</span><span class="o">.</span><span class="n">check_correctness_custom_settings</span><span class="p">(</span><span class="n">kargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__settings</span> <span class="o">=</span> <span class="n">kargs</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">check_correctness_custom_settings</span><span class="p">(</span><span class="n">custom_settings</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Raise AssertionError is the custom settings are not valid &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">GameSettings</span><span class="o">.</span><span class="n">MAX_ROUND_TIME</span> <span class="ow">in</span> <span class="n">custom_settings</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s2">&quot;Missing MAX ROUND TIME&quot;</span>      <span class="c1"># Check for the MAX ROUND TIME</span>
+        <span class="k">assert</span> <span class="n">GameSettings</span><span class="o">.</span><span class="n">TOT_ROUND_NUMBER</span> <span class="ow">in</span> <span class="n">custom_settings</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s2">&quot;Missing TOT ROUND NUMBER&quot;</span>  <span class="c1"># Check for the TOT ROUND NUMBER</span>
+        <span class="k">assert</span> <span class="n">GameSettings</span><span class="o">.</span><span class="n">GAME_DIFFICULTY</span> <span class="ow">in</span> <span class="n">custom_settings</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s2">&quot;Missing GAME DIFFICULTY&quot;</span>    <span class="c1"># Check for the GAME DIFFICULTY</span>
+        <span class="k">assert</span> <span class="n">GameSettings</span><span class="o">.</span><span class="n">MAX_ROUND_SCORE</span> <span class="ow">in</span> <span class="n">custom_settings</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s2">&quot;Missing MAX ROUND SCORE&quot;</span>    <span class="c1"># Check for the MAX ROUND SCORE</span>
+        <span class="k">assert</span> <span class="n">GameSettings</span><span class="o">.</span><span class="n">WORD_LENGTH</span> <span class="ow">in</span> <span class="n">custom_settings</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s2">&quot;Missing WORD LENGHT&quot;</span>            <span class="c1"># Check for the WORD LENGHT</span>
+        <span class="k">assert</span> <span class="n">GameSettings</span><span class="o">.</span><span class="n">PENALTY</span> <span class="ow">in</span> <span class="n">custom_settings</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s2">&quot;Missing PENALTY&quot;</span>                    <span class="c1"># Check for the PENALTY</span>
+        <span class="k">assert</span> <span class="n">GameSettings</span><span class="o">.</span><span class="n">HINT_NUMBER</span> <span class="ow">in</span> <span class="n">custom_settings</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s2">&quot;Missing HINT NUMBER&quot;</span>            <span class="c1"># Check for the HINT NUMBER</span>
+        <span class="k">assert</span> <span class="n">GameSettings</span><span class="o">.</span><span class="n">HINT_PENALTY</span> <span class="ow">in</span> <span class="n">custom_settings</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s2">&quot;Missing HINT PENALTY&quot;</span>          <span class="c1"># Check for the HINT PENALTY</span>
+        <span class="k">assert</span> <span class="n">GameSettings</span><span class="o">.</span><span class="n">INTRO</span> <span class="ow">in</span> <span class="n">custom_settings</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s2">&quot;Missing INTRO&quot;</span>                        <span class="c1"># Check for intro message</span>
+
+    <span class="k">def</span> <span class="nf">get_max_time_per_round</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Return the maximum time per round in seconds &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__settings</span><span class="p">[</span><span class="n">GameSettings</span><span class="o">.</span><span class="n">MAX_ROUND_TIME</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">get_total_round_number</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Return the total number of round for the game &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__settings</span><span class="p">[</span><span class="n">GameSettings</span><span class="o">.</span><span class="n">TOT_ROUND_NUMBER</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">get_game_difficulty</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Return the game difficulty &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__settings</span><span class="p">[</span><span class="n">GameSettings</span><span class="o">.</span><span class="n">GAME_DIFFICULTY</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">get_max_round_score</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Return the maximum score that a user could get from a single round (in %) &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__settings</span><span class="p">[</span><span class="n">GameSettings</span><span class="o">.</span><span class="n">MAX_ROUND_SCORE</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">get_word_lenght</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot; Return the min and the max word lenght for the current difficulty &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__settings</span><span class="p">[</span><span class="n">GameSettings</span><span class="o">.</span><span class="n">WORD_LENGTH</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">get_penalty</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Return the penalty (in terms on number of body part to add) &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__settings</span><span class="p">[</span><span class="n">GameSettings</span><span class="o">.</span><span class="n">PENALTY</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">get_number_of_hints</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot; Return the min and the max number of hint available depends on the current word lenght &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__settings</span><span class="p">[</span><span class="n">GameSettings</span><span class="o">.</span><span class="n">HINT_NUMBER</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">get_hint_penalty</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Return a bit 0/1. If 0 no penalty, otherwise tot_score = tot_score - (word_len) / (max_hint * 100) &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__settings</span><span class="p">[</span><span class="n">GameSettings</span><span class="o">.</span><span class="n">HINT_PENALTY</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">get_intro</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Return the intro message &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__settings</span><span class="p">[</span><span class="n">GameSettings</span><span class="o">.</span><span class="n">INTRO</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">change_game_difficulty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_difficulty</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Change the game difficulty and set new settings &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__settings</span> <span class="o">=</span> <span class="n">GameSettings</span><span class="o">.</span><span class="n">get_settings</span><span class="p">(</span><span class="n">new_difficulty</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">map_wordlen_maxhints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wordlen</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Return the maximum number of hints for a given word len &quot;&quot;&quot;</span>
+        <span class="n">wordlen_sett</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__settings</span><span class="p">[</span><span class="n">GameSettings</span><span class="o">.</span><span class="n">WORD_LENGTH</span><span class="p">]</span>
+        <span class="n">wordlen_ranges</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">wordlen_sett</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">wordlen_sett</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="n">hints_sett</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__settings</span><span class="p">[</span><span class="n">GameSettings</span><span class="o">.</span><span class="n">HINT_NUMBER</span><span class="p">]</span>
+        <span class="n">hints_range</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">hints_sett</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">hints_sett</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">word_len_index</span> <span class="o">=</span> <span class="n">wordlen_ranges</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">wordlen</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">hints_range</span><span class="p">[</span><span class="n">word_len_index</span><span class="p">]</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">hints_range</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="GameStatus"><a class="viewcode-back" href="../../game.html#game.game_state.GameStatus">[docs]</a><span class="k">class</span> <span class="nc">GameStatus</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Describe the current state of the game in terms of:</span>
+<span class="sd">    - current round</span>
+<span class="sd">    - current word</span>
+<span class="sd">    - number of guessed letters</span>
+<span class="sd">    - number of wrong guessed letters</span>
+<span class="sd">    - state of the word to guess</span>
+<span class="sd">    - game settings</span>
+<span class="sd">    - length of the current word to guess</span>
+<span class="sd">    - number of hints</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">settings</span><span class="p">:</span> <span class="n">GameSetting</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; The init method &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__game_settings</span> <span class="o">=</span> <span class="n">settings</span>  <span class="c1"># The current settings of the game</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__round</span> <span class="o">=</span> <span class="mi">0</span>                      <span class="c1"># The current round</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__word</span>  <span class="o">=</span> <span class="s2">&quot;&quot;</span>                     <span class="c1"># The current word to guess</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__number_of_guessed_letters</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># How many letters the player has guessed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__number_of_wrong_letters</span> <span class="o">=</span> <span class="mi">0</span>    <span class="c1"># How many letters the player has guessed wrong</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__score</span> <span class="o">=</span> <span class="mi">0</span>                      <span class="c1"># The user score</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__penalty</span> <span class="o">=</span> <span class="mi">0</span>                    <span class="c1"># Number of obtained penalty</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__len_current_word</span> <span class="o">=</span> <span class="mi">0</span>      <span class="c1"># The length of the current word that has to be guessed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__number_of_used_hints</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Number of used hints</span>
+
+        <span class="c1"># The state of the current word = _ for unknow letters, chr for known or guessed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__word_state</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;_&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__len_current_word</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">game_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return the current game settings &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__game_settings</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">round</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Return the current round of the game &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__round</span>
+
+    <span class="nd">@round</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">round</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Update the value of the attribute round &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__round</span> <span class="o">=</span> <span class="n">new_value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">word</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Return the current word to guess &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__word</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">number_of_guessed_letters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Return the number of letters the user has guessed &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__number_of_guessed_letters</span>
+
+    <span class="nd">@number_of_guessed_letters</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">number_of_guessed_letters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Update the value of the attribute number_of_guessed_letters &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__number_of_guessed_letters</span> <span class="o">=</span> <span class="n">new_value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">number_of_wrong_letters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Return the number of wrong guess &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__number_of_wrong_letters</span>
+
+    <span class="nd">@number_of_wrong_letters</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">number_of_wrong_letters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Update the value of the attribute number_of_wrong_letters &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__number_of_wrong_letters</span> <span class="o">=</span> <span class="n">new_value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">word_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot; Return the state of the current word, i.e., which letters have been guessed &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__word_state</span>
+
+<div class="viewcode-block" id="GameStatus.update_word_state"><a class="viewcode-back" href="../../game.html#game.game_state.GameStatus.update_word_state">[docs]</a>    <span class="k">def</span> <span class="nf">update_word_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">letter</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Update the state of the word inserting in the index idx the letter &quot;letter&quot; &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__word_state</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">letter</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Return the score of the user &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__score</span>
+
+    <span class="nd">@score</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Set a new value for score &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__score</span> <span class="o">=</span> <span class="n">new_value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">penalty</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Return the penalty counter &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__penalty</span>
+
+    <span class="nd">@penalty</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">penalty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Set a new value for the attribute penalty &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__penalty</span> <span class="o">=</span> <span class="n">new_value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">len_current_word</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Return the length of the current word &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__len_current_word</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">number_of_used_hints</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Return the number of used hint &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__number_of_used_hints</span>
+
+    <span class="nd">@number_of_used_hints</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">number_of_used_hints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Set a new value for the attribute number_of_used_hints &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__number_of_used_hints</span> <span class="o">=</span> <span class="n">new_value</span>
+
+<div class="viewcode-block" id="GameStatus.next_round"><a class="viewcode-back" href="../../game.html#game.game_state.GameStatus.next_round">[docs]</a>    <span class="k">def</span> <span class="nf">next_round</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">word</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Start a new round updating the current state with a new state:</span>
+<span class="sd">        1. increments the round counter</span>
+<span class="sd">        2. reset all the other counter</span>
+<span class="sd">        3. do other useful but uninteresting stuff</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__word</span> <span class="o">=</span> <span class="n">word</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__len_current_word</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__word</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__round</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__number_of_used_hints</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__number_of_wrong_letters</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__number_of_guessed_letters</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__penalty</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># We set some letters of the word_state to clear depending on the difficulty</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__word_state</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot; &quot;</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__len_current_word</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__game_settings</span><span class="o">.</span><span class="n">get_game_difficulty</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Hard&quot;</span><span class="p">,</span> <span class="s2">&quot;Very Hard&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__word_state</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__word</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__word_state</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__word</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__word</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__word</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__word_state</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__word</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">__game_settings</span><span class="o">.</span><span class="n">get_game_difficulty</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Easy&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__word_state</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__word</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__word_state</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__word</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__word_state</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__word</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Riccardo La Marca.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

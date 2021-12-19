@@ -1,6 +1,6 @@
 import time
 from typing import Dict, List
-from src.util.config import *
+from util.config import *
 import curses
 import pydub
 import pydub.playback as playbck

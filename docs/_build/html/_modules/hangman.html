@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hangman &mdash; Hangman4CLI 1.0.0v documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link href="../_static/stylesheet.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Hangman4CLI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../intro.html">1. HANGMAN 4 CommandLine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">2. API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">3. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html#contact">4. Contact</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Hangman4CLI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Module code</a> &raquo;</li>
+      <li>hangman</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for hangman</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">conductor.cond</span> <span class="kn">import</span> <span class="n">Conductor</span>
+<span class="kn">from</span> <span class="nn">word.oracle</span> <span class="kn">import</span> <span class="n">WordOracle</span>
+<span class="kn">from</span> <span class="nn">game.game_obj</span> <span class="kn">import</span> <span class="n">Game</span>
+<span class="kn">from</span> <span class="nn">util.config</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">curses</span>
+<span class="kn">import</span> <span class="nn">pydub</span>
+<span class="kn">import</span> <span class="nn">pydub.playback</span> <span class="k">as</span> <span class="nn">playbck</span>
+
+
+<div class="viewcode-block" id="TerminalHangman"><a class="viewcode-back" href="../main.html#hangman.TerminalHangman">[docs]</a><span class="k">class</span> <span class="nc">TerminalHangman</span><span class="p">:</span>
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stdscr</span><span class="p">:</span> <span class="n">curses</span><span class="o">.</span><span class="n">window</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+		<span class="sd">&quot;&quot;&quot; The init method &quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">__stdscr</span> <span class="o">=</span> <span class="n">stdscr</span>  <span class="c1"># The standard screen for curses</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">__stdscr</span><span class="o">.</span><span class="n">nodelay</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+		<span class="c1"># Setupping colors</span>
+		<span class="n">Colors</span><span class="o">.</span><span class="n">setup_colors</span><span class="p">()</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">__word_generator</span> <span class="o">=</span> <span class="n">WordOracle</span><span class="p">()</span>                    <span class="c1"># The word generator oracle</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">__conductor</span>      <span class="o">=</span> <span class="n">Conductor</span><span class="p">()</span>                     <span class="c1"># The conductor of the game</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">__game</span> 		  <span class="o">=</span> <span class="n">Game</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__conductor</span><span class="p">)</span>			<span class="c1"># The game object</span>
+
+		<span class="c1"># Get the background music</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">__background_music</span> <span class="o">=</span> <span class="n">pydub</span><span class="o">.</span><span class="n">AudioSegment</span><span class="o">.</span><span class="n">from_mp3</span><span class="p">(</span><span class="n">System</span><span class="o">.</span><span class="n">SCIFI_MUSIC</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">__background_music</span> <span class="o">-=</span> <span class="mi">20</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">__bckgrd_music_thread</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">playbck</span><span class="o">.</span><span class="n">play</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__background_music</span><span class="p">,))</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">__processes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">multiprocessing</span><span class="o">.</span><span class="n">Process</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__bckgrd_music_thread</span><span class="p">]</span>
+
+	<span class="k">def</span> <span class="nf">__show_title</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+		<span class="sd">&quot;&quot;&quot; Show the title of the game &quot;&quot;&quot;</span>
+		<span class="c1"># I wanna put the title at the center of the screen</span>
+		<span class="c1"># I have to get the number of colums of the screen</span>
+		<span class="n">screen_ncols</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">curses</span><span class="o">.</span><span class="n">COLS</span> <span class="o">-</span> <span class="mi">1</span>
+
+		<span class="c1"># Then, I have to take the length of the title (just the first row)</span>
+		<span class="n">title_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">AsciiArt</span><span class="o">.</span><span class="n">TITLE</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+		<span class="c1"># Then, take the middle point</span>
+		<span class="n">position</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="p">(</span><span class="n">screen_ncols</span> <span class="o">-</span> <span class="n">title_len</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+
+		<span class="c1"># Refactor the title</span>
+		<span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="n">position</span> <span class="o">+</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">AsciiArt</span><span class="o">.</span><span class="n">TITLE</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)])</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">__stdscr</span><span class="o">.</span><span class="n">addstr</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">Colors</span><span class="o">.</span><span class="n">return_pair_for_index</span><span class="p">(</span><span class="n">Colors</span><span class="o">.</span><span class="n">TITLE</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">|</span> <span class="n">curses</span><span class="o">.</span><span class="n">A_BOLD</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">__stdscr</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
+
+	<span class="k">def</span> <span class="nf">__show_conductor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+		<span class="sd">&quot;&quot;&quot; Show the conductor &quot;&quot;&quot;</span>
+		<span class="c1"># Initialize the conductor window</span>
+		<span class="n">conductor_window</span><span class="p">,</span> <span class="n">conductor_pad</span> <span class="o">=</span> <span class="n">Conductor</span><span class="o">.</span><span class="n">initialize_container</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">__conductor</span><span class="o">.</span><span class="n">window</span> <span class="o">=</span> <span class="n">conductor_window</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">__conductor</span><span class="o">.</span><span class="n">conductor_pad</span> <span class="o">=</span> <span class="n">conductor_pad</span>
+
+		<span class="c1"># Create the pad in which insert the ASCII Art of the conductor</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">__conductor</span><span class="o">.</span><span class="n">add_condactor_art</span><span class="p">()</span>
+
+		<span class="c1"># Update the window</span>
+		<span class="n">curses</span><span class="o">.</span><span class="n">doupdate</span><span class="p">()</span>
+
+		<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+
+		<span class="c1"># Print the introduction from the Conductor</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">__conductor</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">section</span><span class="o">=</span><span class="s2">&quot;START GAME&quot;</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">__show_game</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+		<span class="sd">&quot;&quot;&quot; Show the game window &quot;&quot;&quot;</span>
+		<span class="c1"># Initialize the game window</span>
+		<span class="n">game_window</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">initialize_window</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">window</span> <span class="o">=</span> <span class="n">game_window</span>
+
+		<span class="n">curses</span><span class="o">.</span><span class="n">doupdate</span><span class="p">()</span>
+
+		<span class="n">ask_pad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">add_query_game</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">query_game_pad</span> <span class="o">=</span> <span class="n">ask_pad</span>
+
+		<span class="n">curses</span><span class="o">.</span><span class="n">doupdate</span><span class="p">()</span>
+
+		<span class="n">diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">get_difficulty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__stdscr</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_settings</span><span class="o">.</span><span class="n">change_game_difficulty</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">update_window_title</span><span class="p">()</span>
+
+		<span class="n">game_hangman_pad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">add_hangman_pad</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">hangman_pad</span> <span class="o">=</span> <span class="n">game_hangman_pad</span>
+
+		<span class="n">game_settings_pad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">add_game_setting_pad</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_setting_pad</span> <span class="o">=</span> <span class="n">game_settings_pad</span>
+
+		<span class="n">game_status_pad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">add_game_status_pad</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_status_pad</span> <span class="o">=</span> <span class="n">game_status_pad</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">update_status</span><span class="p">()</span>
+
+		<span class="n">game_log_pad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">add_log_pad</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_log_pad</span> <span class="o">=</span> <span class="n">game_log_pad</span>
+
+		<span class="n">game_word_pad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">add_word_pad</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_word_pad</span> <span class="o">=</span> <span class="n">game_word_pad</span>
+
+		<span class="n">curses</span><span class="o">.</span><span class="n">doupdate</span><span class="p">()</span>
+
+	<span class="k">def</span> <span class="nf">_start_game</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+		<span class="sd">&quot;&quot;&quot; Start the game &quot;&quot;&quot;</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="c1"># Start the music</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">__bckgrd_music_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+			<span class="bp">self</span><span class="o">.</span><span class="n">__stdscr</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+			<span class="c1"># Let&#39;s show the game&#39;s title</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">__show_title</span><span class="p">()</span>
+
+			<span class="c1"># Let&#39;s show the conductor</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">__show_conductor</span><span class="p">()</span>
+
+			<span class="c1"># Let&#39;s introduce the game</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">__show_game</span><span class="p">()</span>
+
+			<span class="c1"># Start the game</span>
+			<span class="n">min_len_w</span><span class="p">,</span> <span class="n">max_len_w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_settings</span><span class="o">.</span><span class="n">get_word_lenght</span><span class="p">()</span>
+			<span class="n">n_round</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_settings</span><span class="o">.</span><span class="n">get_total_round_number</span><span class="p">()</span>
+			<span class="k">for</span> <span class="n">current_word</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__word_generator</span><span class="o">.</span><span class="n">get_word</span><span class="p">(</span><span class="n">n_times</span><span class="o">=</span><span class="n">n_round</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="n">min_len_w</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="n">max_len_w</span><span class="p">):</span>
+				<span class="c1"># Update the state</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_status</span><span class="o">.</span><span class="n">next_round</span><span class="p">(</span><span class="n">word</span><span class="o">=</span><span class="n">current_word</span><span class="p">)</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">update_status</span><span class="p">()</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">update_word_pad</span><span class="p">(</span><span class="n">reset_cursor</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">__conductor</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">section</span><span class="o">=</span><span class="s2">&quot;START ROUND&quot;</span><span class="p">)</span>
+				<span class="n">curses</span><span class="o">.</span><span class="n">doupdate</span><span class="p">()</span>
+
+				<span class="n">current_position</span> <span class="o">=</span> <span class="mi">0</span>
+				<span class="n">tmp_position</span> <span class="o">=</span> <span class="n">current_position</span>
+
+				<span class="n">body_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+					<span class="s2">&quot;head&quot;</span><span class="p">:</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;larm&quot;</span><span class="p">:</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;body&quot;</span><span class="p">:</span> <span class="s2">&quot; &quot;</span><span class="p">,</span>
+					<span class="s2">&quot;rarm&quot;</span><span class="p">:</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;lleg&quot;</span><span class="p">:</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;rleg&quot;</span><span class="p">:</span> <span class="s2">&quot; &quot;</span><span class="p">,</span>
+					<span class="s2">&quot;lfoot&quot;</span><span class="p">:</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;rfoot&quot;</span><span class="p">:</span> <span class="s2">&quot; &quot;</span>
+				<span class="p">}</span>
+				<span class="n">is_veryhard</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_settings</span><span class="o">.</span><span class="n">get_game_difficulty</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Very Hard&quot;</span>
+				<span class="n">init_seconds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_settings</span><span class="o">.</span><span class="n">get_max_time_per_round</span><span class="p">()</span>
+				<span class="n">current_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+				<span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_status</span><span class="o">.</span><span class="n">word_state</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> \
+						<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_status</span><span class="o">.</span><span class="n">number_of_wrong_letters</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">is_veryhard</span> <span class="o">*</span> <span class="mi">7</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">is_veryhard</span><span class="p">)</span> <span class="o">*</span> <span class="mi">8</span><span class="p">)</span> <span class="ow">and</span> \
+						<span class="n">init_seconds</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+					<span class="k">try</span><span class="p">:</span>
+						<span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stdscr</span><span class="o">.</span><span class="n">getkey</span><span class="p">()</span>
+						<span class="c1"># If it is a normal char then write it (temp)</span>
+						<span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">Char</span><span class="o">.</span><span class="n">NORMAL_CHAR</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_status</span><span class="o">.</span><span class="n">word_state</span><span class="p">[</span><span class="n">current_position</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot; &quot;</span><span class="p">:</span>
+							<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">write_log</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">LogMessages</span><span class="o">.</span><span class="n">CHAR_INSERTION</span><span class="p">,</span> <span class="n">insert</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+							<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_status</span><span class="o">.</span><span class="n">word</span><span class="p">[</span><span class="n">current_position</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">:</span>
+								<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">write_guess_letter</span><span class="p">(</span><span class="n">current_pos</span><span class="o">=</span><span class="n">current_position</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+								<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">write_log</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">LogMessages</span><span class="o">.</span><span class="n">RIGTH_GUESS</span><span class="p">,</span> <span class="n">insert</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+								<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_status</span><span class="o">.</span><span class="n">number_of_guessed_letters</span> <span class="o">+=</span> <span class="mi">1</span>
+							<span class="k">else</span><span class="p">:</span>
+								<span class="bp">self</span><span class="o">.</span><span class="n">__conductor</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">section</span><span class="o">=</span><span class="s2">&quot;ON ERROR&quot;</span><span class="p">)</span>
+								<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">write_log</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">LogMessages</span><span class="o">.</span><span class="n">WRONG_GUESS</span><span class="p">,</span> <span class="n">insert</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+								<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_status</span><span class="o">.</span><span class="n">number_of_wrong_letters</span> <span class="o">+=</span> <span class="mi">1</span>
+
+								<span class="k">if</span> <span class="n">is_veryhard</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_status</span><span class="o">.</span><span class="n">number_of_wrong_letters</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+									<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_status</span><span class="o">.</span><span class="n">number_of_wrong_letters</span> <span class="o">+=</span> <span class="mi">1</span>
+
+								<span class="n">Game</span><span class="o">.</span><span class="n">update_body_dict</span><span class="p">(</span>
+									<span class="n">body_dict</span><span class="o">=</span><span class="n">body_dict</span><span class="p">,</span>
+									<span class="n">current_wrong_try</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_status</span><span class="o">.</span><span class="n">number_of_wrong_letters</span><span class="p">,</span>
+									<span class="n">is_veryhard</span><span class="o">=</span><span class="n">is_veryhard</span>
+								<span class="p">)</span>
+
+								<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">update_hangman</span><span class="p">(</span><span class="n">body_dict</span><span class="o">=</span><span class="n">body_dict</span><span class="p">)</span>
+
+						<span class="c1"># Otherwise, could be an arrows</span>
+						<span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;KEY_LEFT&quot;</span> <span class="ow">and</span> <span class="n">current_position</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+							<span class="n">tmp_position</span> <span class="o">-=</span> <span class="mi">1</span>
+						<span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;KEY_RIGHT&quot;</span> <span class="ow">and</span> <span class="n">current_position</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_word</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+							<span class="n">tmp_position</span> <span class="o">+=</span> <span class="mi">1</span>
+
+						<span class="k">if</span> <span class="n">tmp_position</span> <span class="o">!=</span> <span class="n">current_position</span><span class="p">:</span>
+							<span class="n">current_position</span> <span class="o">=</span> <span class="n">tmp_position</span>
+							<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">write_log</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">LogMessages</span><span class="o">.</span><span class="n">BOX_SELECTION</span><span class="p">,</span> <span class="n">insert</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">current_position</span><span class="p">))</span>
+							<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">move_cursor</span><span class="p">(</span><span class="n">current_position</span><span class="p">)</span>
+
+						<span class="c1"># Else use hint</span>
+						<span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;1&quot;</span><span class="p">:</span>
+							<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_status</span><span class="o">.</span><span class="n">number_of_used_hints</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_settings</span><span class="o">.</span><span class="n">map_wordlen_maxhints</span><span class="p">(</span><span class="n">wordlen</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">current_word</span><span class="p">)):</span>
+								<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_status</span><span class="o">.</span><span class="n">number_of_used_hints</span> <span class="o">+=</span> <span class="mi">1</span>
+								<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">write_guess_letter</span><span class="p">(</span>
+									<span class="n">current_pos</span><span class="o">=</span><span class="n">current_position</span><span class="p">,</span>
+									<span class="n">key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_status</span><span class="o">.</span><span class="n">word</span><span class="p">[</span><span class="n">current_position</span><span class="p">]</span>
+								<span class="p">)</span>
+								<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">write_log</span><span class="p">(</span>
+									<span class="n">message</span><span class="o">=</span><span class="n">LogMessages</span><span class="o">.</span><span class="n">HINT_USED</span><span class="p">,</span>
+									<span class="n">insert</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_status</span><span class="o">.</span><span class="n">number_of_used_hints</span><span class="p">)</span>
+								<span class="p">)</span>
+							<span class="k">else</span><span class="p">:</span>
+								<span class="bp">self</span><span class="o">.</span><span class="n">__conductor</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">section</span><span class="o">=</span><span class="s2">&quot;NO HINT&quot;</span><span class="p">)</span>
+
+						<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">update_status</span><span class="p">()</span>
+						<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">move_cursor</span><span class="p">(</span><span class="n">current_position</span><span class="p">)</span>
+					<span class="k">except</span> <span class="n">curses</span><span class="o">.</span><span class="n">error</span><span class="p">:</span>
+
+						<span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">current_time</span> <span class="o">-</span> <span class="p">(</span><span class="n">t</span> <span class="o">:=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()))</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+							<span class="n">current_time</span> <span class="o">=</span> <span class="n">t</span>
+							<span class="n">init_seconds</span> <span class="o">-=</span> <span class="mi">1</span>
+
+							<span class="n">hour</span> <span class="o">=</span> <span class="n">init_seconds</span> <span class="o">//</span> <span class="mi">3600</span>
+							<span class="n">hour_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">hour</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">hour</span> <span class="o">&gt;</span> <span class="mi">9</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;0</span><span class="si">{</span><span class="n">hour</span><span class="si">}</span><span class="s2">&quot;</span>
+
+							<span class="n">minute</span> <span class="o">=</span> <span class="p">(</span><span class="n">init_seconds</span> <span class="o">%</span> <span class="mi">3600</span><span class="p">)</span> <span class="o">//</span> <span class="mi">60</span>
+							<span class="n">minute_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">minute</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">minute</span> <span class="o">&gt;</span> <span class="mi">9</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;0</span><span class="si">{</span><span class="n">minute</span><span class="si">}</span><span class="s2">&quot;</span>
+
+							<span class="n">second</span> <span class="o">=</span> <span class="n">init_seconds</span> <span class="o">%</span> <span class="mi">60</span>
+							<span class="n">second_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">second</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">second</span> <span class="o">&gt;</span> <span class="mi">9</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;0</span><span class="si">{</span><span class="n">second</span><span class="si">}</span><span class="s2">&quot;</span>
+
+							<span class="n">time_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">hour_str</span><span class="si">}</span><span class="s2">H:</span><span class="si">{</span><span class="n">minute_str</span><span class="si">}</span><span class="s2">M:</span><span class="si">{</span><span class="n">second_str</span><span class="si">}</span><span class="s2">S&quot;</span>
+							<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">update_time</span><span class="p">(</span><span class="n">time_str</span><span class="p">,</span> <span class="n">cursor_position</span><span class="o">=</span><span class="n">current_position</span><span class="p">)</span>
+
+					<span class="k">finally</span><span class="p">:</span>
+						<span class="n">curses</span><span class="o">.</span><span class="n">doupdate</span><span class="p">()</span>
+
+				<span class="c1"># the user wins</span>
+				<span class="n">score</span> <span class="o">=</span> <span class="mi">0</span>
+				<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_status</span><span class="o">.</span><span class="n">word_state</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+					<span class="n">score</span> <span class="o">=</span> <span class="mi">100</span>
+
+				<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_settings</span><span class="o">.</span><span class="n">get_game_difficulty</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Very Hard&quot;</span><span class="p">:</span>
+					<span class="n">word_len</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_status</span><span class="o">.</span><span class="n">len_current_word</span>
+					<span class="n">used_hints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_status</span><span class="o">.</span><span class="n">number_of_used_hints</span>
+					<span class="n">score</span> <span class="o">-=</span> <span class="p">(</span> <span class="n">word_len</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_settings</span><span class="o">.</span><span class="n">map_wordlen_maxhints</span><span class="p">(</span><span class="n">wordlen</span><span class="o">=</span><span class="n">word_len</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">))</span> <span class="o">*</span> <span class="n">used_hints</span>
+
+				<span class="n">current_tot_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_status</span><span class="o">.</span><span class="n">score</span>
+				<span class="k">if</span> <span class="n">current_tot_score</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">score</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+					<span class="n">current_tot_score</span> <span class="o">=</span> <span class="mi">0</span>
+				<span class="k">else</span><span class="p">:</span>
+					<span class="n">current_tot_score</span> <span class="o">=</span> <span class="p">(</span><span class="n">current_tot_score</span> <span class="o">+</span> <span class="n">score</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_status</span><span class="o">.</span><span class="n">round</span>
+
+				<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_status</span><span class="o">.</span><span class="n">score</span> <span class="o">=</span> <span class="n">current_tot_score</span>
+
+				<span class="n">section</span> <span class="o">=</span> <span class="s2">&quot;END POSITIVE ROUND&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">game_status</span><span class="o">.</span><span class="n">word_state</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;END NEGATIVE ROUND&quot;</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">__conductor</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">section</span><span class="o">=</span><span class="n">section</span><span class="p">)</span>
+
+				<span class="c1"># Show the entire word</span>
+				<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">lett</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">current_word</span><span class="p">):</span>
+					<span class="bp">self</span><span class="o">.</span><span class="n">__game</span><span class="o">.</span><span class="n">write_guess_letter</span><span class="p">(</span><span class="n">current_pos</span><span class="o">=</span><span class="n">idx</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">lett</span><span class="p">)</span>
+					<span class="n">curses</span><span class="o">.</span><span class="n">doupdate</span><span class="p">()</span>
+
+				<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+		<span class="k">except</span> <span class="p">(</span><span class="ne">KeyboardInterrupt</span><span class="p">,</span> <span class="ne">EOFError</span><span class="p">):</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+
+<div class="viewcode-block" id="TerminalHangman.run"><a class="viewcode-back" href="../main.html#hangman.TerminalHangman.run">[docs]</a>	<span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+		<span class="sd">&quot;&quot;&quot; Run the game &quot;&quot;&quot;</span>
+		<span class="c1"># Start the game</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_start_game</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TerminalHangman.terminate"><a class="viewcode-back" href="../main.html#hangman.TerminalHangman.terminate">[docs]</a>	<span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+		<span class="sd">&quot;&quot;&quot; Terminate all the secondary processes and return to the main window &quot;&quot;&quot;</span>
+		<span class="c1"># Kill processes</span>
+		<span class="k">for</span> <span class="n">process</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__processes</span><span class="p">:</span>
+			<span class="n">process</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+
+		<span class="c1"># Return to the main screen settings</span>
+		<span class="n">curses</span><span class="o">.</span><span class="n">endwin</span><span class="p">()</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">stdscr</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+	<span class="n">t</span> <span class="o">=</span> <span class="n">TerminalHangman</span><span class="p">(</span><span class="n">stdscr</span><span class="p">)</span>
+	<span class="n">t</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+	<span class="n">curses</span><span class="o">.</span><span class="n">wrapper</span><span class="p">(</span><span class="n">main</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Riccardo La Marca.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
